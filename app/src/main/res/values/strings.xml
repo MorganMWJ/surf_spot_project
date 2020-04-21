@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Search Surf Places</string>
+
+    <!-- Main Activity Strings -->
+    <string name="hint_word">Enter a location (latitude/longitude)</string>
+    <string name="search_button_text">Search</string>
+
+
+    <string name="load_location_button_text">Use Current Location</string>
+    <string name="title_location_permission">Location Permission</string>
+    <string name="text_location_permission">Enable the app to use your current location?</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Toast/Alert Strings -->
+    <string name="parse_double_exception">Input Values must be doubles</string>
+    <string name="empty_field_exception">Please enter latitude * longitude</string>
+    <string name="api_key_button_title">Change API Key</string>
+    <string name="change_key_dialog_title">Change Google Places API Key</string>
+
+    <!-- Default api key -->
+    <string name="default_key">AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM</string>
+
+</resources>
