@@ -1,0 +1,30 @@
+1)
+
+I spent 3 days working on the project. I had to revise android and I wrote the MainActivty
+class in kotlin which I had not used previously. If not for the time spent learning I think
+I would have achieved more in that time. The motivation for using Kotlin was to get familar
+with the language as recomended.
+
+I would implement the following changes to my solution:
+	-A slider enabling the user to change km radius of search distance.
+	-Input for the user to change search key from 'lodging'.
+	-I would parse more of the JSON attributes provided by the Places API for display to the user.
+		-Address
+		-Telephone number
+		-Photos
+	-I would implement the optional map fucntionality
+	-I would like a better UI, perhaps looking into learning material design or similar.
+	-I would put the user inputs in a menu drawer so they always take up a large part of the screen.
+	
+2)
+
+I used retrofit for a REST client with GSON for a JSON deserialiser. 
+The two were new to me but worked well together. The most useful thing I found
+was being able to search premade vector graphics in Android Studio. I could quickly
+select a simple button icon/image without having to download one or make my own.
+
+3)
+
+	
+
+	

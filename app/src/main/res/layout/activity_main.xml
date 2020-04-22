@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:columnCount="2"
-        android:rowCount="5"
+        android:rowCount="3"
         android:layout_margin="@dimen/big_padding">
 
         <EditText
@@ -19,17 +19,19 @@
             android:layout_height="wrap_content"
             android:layout_row="0"
             android:layout_column="0"
+            android:layout_columnSpan="2"
             android:layout_columnWeight="1"
             android:fontFamily="sans-serif-light"
             android:hint="Latitude"
-            android:inputType="textAutoComplete"/>
+            android:inputType="textAutoComplete" />
 
         <EditText
             android:id="@+id/edit_long"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_row="0"
-            android:layout_column="1"
+            android:layout_row="1"
+            android:layout_column="0"
+            android:layout_columnSpan="2"
             android:layout_columnWeight="1"
             android:fontFamily="sans-serif-light"
             android:hint="Longitude"
@@ -39,8 +41,8 @@
             android:id="@+id/load_location_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_row="2"
             android:layout_column="0"
-            android:layout_row="1"
             android:layout_columnWeight="1"
             android:text="@string/load_location_button_text" />
 
@@ -48,10 +50,10 @@
             android:id="@+id/run_search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_row="2"
             android:layout_column="1"
-            android:layout_row="1"
             android:layout_columnWeight="1"
-            android:text="@string/search_button_text" />
+            android:text="@string/search_button_text"/>
     </GridLayout>
 
     <View
@@ -64,12 +66,13 @@
 
 
     <TextView
-        android:id="@+id/text_view_result"
+        android:id="@+id/results_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-        <!--android:textSize="30sp"-->
-        <!--android:text="No Current Results"-->
-        <!--android:textColor="#000" />-->
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="30sp"
+        android:text="Zero Results"
+        android:visibility="gone"/>
 
 
     <android.support.v7.widget.RecyclerView

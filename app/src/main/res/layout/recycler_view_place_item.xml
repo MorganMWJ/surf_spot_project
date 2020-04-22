@@ -21,12 +21,19 @@
             android:textSize="20sp"
             android:textColor="@color/colorPrimaryDark"/>
 
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignLeft="@id/place_rating_text_view"-->
+            <!--android:src="@drawable/ic_star_yellow_48dp"/>-->
+
         <TextView
             android:id="@+id/place_rating_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:textSize="25sp"/>
+            android:textSize="25sp"
+            android:drawableLeft="@drawable/ic_star_yellow_48dp"/>
 
         <TextView
             android:id="@+id/place_open_hours_text_view"

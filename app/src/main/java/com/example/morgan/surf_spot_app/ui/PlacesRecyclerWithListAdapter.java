@@ -109,4 +109,10 @@ public class PlacesRecyclerWithListAdapter extends
         Collections.sort(this.places);
         notifyDataSetChanged();
     }
+
+    public void clearDataSet(){
+        if(places != null) {
+            this.places.clear();
+        }
+    }
 }

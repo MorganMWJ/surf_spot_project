@@ -1,14 +1,24 @@
 package com.example.morgan.surf_spot_app.ui
 
+import android.Manifest
+import android.content.Context
 import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
@@ -29,9 +39,20 @@ class MainActivity : AppCompatActivity() {
 
     private var latitude: Double = 50.4164582
     private var longitude: Double = -5.100202299999978
+    private var locationManager: LocationManager? = null
+    private var locationListener: LocationListener? = null
     private var apiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
     private var placesRecyclerAdapter: PlacesRecyclerWithListAdapter
             = PlacesRecyclerWithListAdapter(this@MainActivity)
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +79,46 @@ class MainActivity : AppCompatActivity() {
         listPlaces.layoutManager = LinearLayoutManager(this)
 
 
-        /* Ask user for location permission during runtime */
-        //checkLocationPermission()
+        /* Set up location manager & listener */
+        locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationListener = object : LocationListener {
+
+            override fun onLocationChanged(location: Location) {
+                Log.i("LOCATION", location.toString())
+                //Toast.makeText(getApplicationContext(),location.latitude.toString()+" , "+location.longitude.toString(),Toast.LENGTH_SHORT).show();
+                setLatitude(location.latitude)
+                setLongitude(location.longitude)
+
+            }
+
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
+
+            }
+
+            override fun onProviderEnabled(provider: String) {
+
+            }
+
+            override fun onProviderDisabled(provider: String) {
+
+            }
+
+        }
+
+        /* Check & request location permissions */
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        } else {
+            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10f, locationListener)
+        }
+    }
+
+    fun setLatitude(latitude: Double){
+        this.latitude = latitude
+    }
+
+    fun setLongitude(longitude: Double){
+        this.longitude = longitude
     }
 
     /**
@@ -133,28 +192,14 @@ class MainActivity : AppCompatActivity() {
      * Update the text fields to display those values.
      */
     private fun loadLocationFromGPS(){
-        var temp = 5
-//        try {
-//
-//            /* Get device latitude and longitude */
-//            var lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//            var location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-//            this.longitude = location.longitude
-//            this.latitude = location.latitude
-//
-//            /* Display values in text fields */
-//            var latTextField: EditText = findViewById(R.id.edit_lat)
-//            latTextField.setText(""+this.latitude)
-//            var longTextField: EditText = findViewById(R.id.edit_long)
-//            longTextField.setText(""+this.longitude)
-//
-//            /* Notify user of success */
-//            Toast.makeText(this@MainActivity, "Loaded location from GPS.", Toast.LENGTH_SHORT).show()
-//        }
-//        catch(se: SecurityException){
-//            /* Notify user of exception */
-//            Toast.makeText(this@MainActivity, "Security Exception: Location not enabled", Toast.LENGTH_SHORT).show()
-//        }
+        /* Display values in text fields */
+        var latTextField: EditText = findViewById(R.id.edit_lat)
+        latTextField.setText(""+this.latitude)
+        var longTextField: EditText = findViewById(R.id.edit_long)
+        longTextField.setText(""+this.longitude)
+
+        /* Notify user of success */
+        Toast.makeText(this@MainActivity, "Loaded location from GPS.", Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -188,13 +233,13 @@ class MainActivity : AppCompatActivity() {
     private fun runSearch() {
 
         /* Lat/Long as location string */
-        //val location: String = this.latitude.toString() + "," + this.longitude.toString()
-        val location: String = "50.4164582,-5.100202299999978"
+        val location: String = this.latitude.toString() + "," + this.longitude.toString()
+        //val location: String = "50.4164582,-5.100202299999978"
 
         /* Create map of query parameter key-values */
         val queryParams: Map<String, String> = mapOf(
-                "radius" to 1500.toString() ,
-                "type" to "cafe", //REPLACE WIRH 'lodging'
+                "radius" to 1000.toString() ,
+                "type" to "lodging", //REPLACE WIRH 'lodging'
                 "keyword" to "surf",
                 "key" to this.apiKey)
 
@@ -224,47 +269,77 @@ class MainActivity : AppCompatActivity() {
         call.enqueue(object : Callback<ResultWrapper> {
             override fun onResponse(call: Call<ResultWrapper>, response: Response<ResultWrapper>) {
 
+                /* If not successful print out status code and return */
                 if (!response.isSuccessful) {
-                    var textViewResult = findViewById<TextView>(R.id.text_view_result)
-                    textViewResult.text = "Code: " + response.code()
+                    alterResultsTextView("Code: " + response.code(), true)
                     return
                 }
 
                 /* Results from response body */
                 val result = response.body()
 
-                /* Display results */
+                /* Handle result */
                 if(result != null) {
                     updateListView(result)
                 }
-
             }
 
             override fun onFailure(call: Call<ResultWrapper>, t: Throwable) {
-                var textViewResult = findViewById<TextView>(R.id.text_view_result)
-                textViewResult.text = t.message
+                /* On call failure print our error message */
+                alterResultsTextView(t.message, true)
             }
         })
         Toast.makeText(this@MainActivity, "You clicked search.", Toast.LENGTH_SHORT).show()
 
     }
 
+    /**
+     * Handles result returned by places API call.
+     * Either by displaying results or alerting user to status.
+     */
     fun updateListView(result: ResultWrapper){
 
         /* If we have places in our results */
-        if (result.results != null) {
+        if (result.results != null && !result.results.isEmpty()) {
 
-            /* And it is not an empty list  */
-            if (!result.results.isEmpty()) {
+            /* Update our view to display them */
+            this.placesRecyclerAdapter.changeDataSet(result.results)
+            alterResultsTextView(null, false)
+        }
 
-                /* Update our view to display them */
-                this.placesRecyclerAdapter.changeDataSet(result.results)
-            }
+        /* If no places */
+        else if(result.status == "ZERO_RESULTS"){
+
+            /* Tell user there were no results */
+            alterResultsTextView("Zero Results", true)
+            /* Empty previous list of places */
+            this.placesRecyclerAdapter.clearDataSet()
         }
-        else{
-            //todo
-            //deal with status code error (alert user)
+
+        /* If api key wrong */
+        else if(result.status == "REQUEST_DENIED"){
+            /* Tell user there was a problem with the request */
+            alterResultsTextView(
+                    "Problem with api or key.\nStatus: " + result.status, true)
+            /* Empty previous list of places */
+            this.placesRecyclerAdapter.clearDataSet()
         }
+    }
+
+    /**
+     * Helper function to edit remove duplicate code.
+     * Edits text display should result not return places.
+     */
+    private fun alterResultsTextView(message: String?, isShown: Boolean){
+        var txtView = findViewById<TextView>(R.id.results_text)
+
+        if(message != null)
+            txtView.text = message
+
+        if(isShown)
+            txtView.visibility=View.VISIBLE
+        else
+            txtView.visibility = View.GONE
     }
 
 }
