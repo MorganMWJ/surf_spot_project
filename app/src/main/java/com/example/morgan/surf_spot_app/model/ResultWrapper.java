@@ -7,17 +7,23 @@ import java.util.List;
 
 public class ResultWrapper {
 
-    @SerializedName("html_attributions")
-    private List htmlAttributions;
+//    @SerializedName("html_attributions") --REMOVE??? not used??
+//    private List htmlAttributions;
     private List<Place> results;
     private String status;
 
-    public List getHtmlAttributions() {
-        return htmlAttributions;
-    }
+//    public List getHtmlAttributions() {
+//        return htmlAttributions;
+//    }
+//
+//    public void setHtmlAttributions(List htmlAttributions) {
+//        this.htmlAttributions = htmlAttributions;
+//    }
 
-    public void setHtmlAttributions(List htmlAttributions) {
-        this.htmlAttributions = htmlAttributions;
+
+    public ResultWrapper(List<Place> results, String status) {
+        this.results = results;
+        this.status = status;
     }
 
     public List<Place> getResults() {
@@ -34,10 +40,6 @@ public class ResultWrapper {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public void sortPlaces(){
-        Collections.sort(this.results);
     }
 
 

@@ -113,10 +113,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Setter for latitude instance variable.
+     */
     fun setLatitude(latitude: Double){
         this.latitude = latitude
     }
 
+    /**
+     * Setter for longitude instance variable.
+     */
     fun setLongitude(longitude: Double){
         this.longitude = longitude
     }
@@ -187,9 +193,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Get current device latitude and longitude from the GPS/location service.
-     * Store the values as instance variables.
-     * Update the text fields to display those values.
+     * Update the text fields to display device latitude and
+     * longitude taken from the GPS/location service.
      */
     private fun loadLocationFromGPS(){
         /* Display values in text fields */
@@ -208,7 +213,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun parseValues(): Boolean {
 
-        var isParsed: Boolean = false
+        var isParsed = false
 
         /* Get EditText fields */
         val latText = findViewById<EditText>(R.id.edit_lat).text.toString()
@@ -280,7 +285,7 @@ class MainActivity : AppCompatActivity() {
 
                 /* Handle result */
                 if(result != null) {
-                    updateListView(result)
+                    handleResult(result)
                 }
             }
 
@@ -297,7 +302,7 @@ class MainActivity : AppCompatActivity() {
      * Handles result returned by places API call.
      * Either by displaying results or alerting user to status.
      */
-    fun updateListView(result: ResultWrapper){
+    fun handleResult(result: ResultWrapper){
 
         /* If we have places in our results */
         if (result.results != null && !result.results.isEmpty()) {
