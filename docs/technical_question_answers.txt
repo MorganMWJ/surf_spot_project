@@ -24,6 +24,17 @@ The two were new to me but worked well together. The most useful thing I found
 was being able to search premade vector graphics in Android Studio. I could quickly
 select a simple button icon/image without having to download one or make my own.
 
+It was not in my code or IDE but the documentation for the Places API was very useful.
+The detail of the places and status codes returned was great. https://developers.google.com/places/web-service/details
+
+Using the GSON library I could esily match the structure of this to include the attibutes 
+I wanted resolving the changes in naming convention using the @SerialisedName annotation.  
+
+I.E. opening_hours -> openingHours
+@SerialisedName("opening_hours") 
+private OpeningHours openingHours; 
+
+
 3)
 
 If due to a bug I would debug the code in an IDE. I would ensure all long processes are run asyncronously and not on a main/UI thread.
