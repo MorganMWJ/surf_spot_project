@@ -1,7 +1,9 @@
 # Instructions for **Running**
 
-I developed this app using Android Studio without an enmulator by running it directly on my device.
-So I would suggest the same for running:
+The app was developed using Android Studio without an enmulator by running it directly on my device.    
+The app was built to be run on a vertical mobile screen.   
+
+Suggested steps for running:
 
 * Clone or download zip of project from github
 * Load the project into Android Studio
