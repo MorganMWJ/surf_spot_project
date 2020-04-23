@@ -1,5 +1,7 @@
 package com.example.morgan.surf_spot_app.model;
 
+import android.text.Html;
+
 import com.google.gson.annotations.SerializedName;
 
 public class OpeningHours {
@@ -9,6 +11,11 @@ public class OpeningHours {
 
     @SerializedName("weekday_text")
     private String[] weekdayText;
+
+    public OpeningHours(boolean openNow, String[] weekdayText) {
+        this.openNow = openNow;
+        this.weekdayText = weekdayText;
+    }
 
     public boolean isOpenNow() {
         return openNow;
@@ -27,16 +34,21 @@ public class OpeningHours {
         this.weekdayText = weekdayText;
     }
 
-    @Override
-    public String toString() {
+    public String toHtmlString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Open Now: ");
-        sb.append(this.openNow);
+
+        if(this.openNow){
+            sb.append("Open Now<br/>");
+        }
+        else{
+            sb.append("Closed<br/>");
+        }
 
         if(this.weekdayText != null) {
             for (String weekday : this.weekdayText) {
-                sb.append("\n");
+                sb.append("&#8226;");
                 sb.append(weekday);
+                sb.append("<br/>");
             }
         }
 

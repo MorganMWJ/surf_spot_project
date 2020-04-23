@@ -3,12 +3,14 @@ package com.example.morgan.surf_spot_app.ui;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.morgan.surf_spot_app.R;
+import com.example.morgan.surf_spot_app.model.OpeningHours;
 import com.example.morgan.surf_spot_app.model.Place;
 
 import java.lang.reflect.Array;
@@ -32,8 +34,10 @@ public class PlacesRecyclerWithListAdapter extends
 
     PlacesRecyclerWithListAdapter(Context context){
         this.context = context;
+        String[] hrs = {"8am - 5pm, Monday - Friday", "12am - 4.30pm, Saturday"};
+        OpeningHours oh = new OpeningHours(true, hrs);
         ArrayList<Place> tp = new ArrayList<>();
-        tp.add(new Place("Morgans PLAce", 6.4, null));
+        tp.add(new Place("Morgans PLAce", 6.5, oh));
         tp.add(new Place("Joshs PLAce", 2.4, null));
         tp.add(new Place("Morgans PLAce", 6.4, null));
         tp.add(new Place("Joshs PLAce", 2.4, null));
@@ -72,8 +76,13 @@ public class PlacesRecyclerWithListAdapter extends
         void bindDataSet(Place p){
             nameView.setText(p.getName());
             ratingView.setText(p.getRating().toString());
-            hoursView.setText("TEMP HOLDER");
-            //hoursView.setText(p.getOpeningHours().toString());
+            if(p.getOpeningHours() != null){
+                String openHourStr = p.getOpeningHours().toHtmlString();
+                hoursView.setText(Html.fromHtml(openHourStr));
+            }
+            else {
+                hoursView.setText(R.string.hours_unavailable);
+            }
             place = p;
         }
     }

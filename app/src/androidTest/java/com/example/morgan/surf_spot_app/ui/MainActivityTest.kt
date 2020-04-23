@@ -1,8 +1,9 @@
 package com.example.morgan.surf_spot_app.ui
 
-import android.support.test.rule.ActivityTestRule
+
 import android.view.View
 import android.widget.EditText
+import androidx.test.annotation.UiThreadTest
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.ResultWrapper
@@ -14,6 +15,11 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import java.util.ArrayList
+
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.rule.ActivityTestRule
 
 class MainActivityTest {
 
@@ -33,6 +39,7 @@ class MainActivityTest {
     }
 
     @Test
+    @UiThreadTest
     fun testUpdateListView_goodResult(){
 
         /* Create ResultWrapper object with places */
@@ -46,7 +53,10 @@ class MainActivityTest {
 
         /* Check places are displayed in recycler view */
 
-        /* Check alternate  */
+        /* Check alternate result text view is 'gone' */
+        onView(withId(R.id.results_text))
+                .check(doesNotExist())
+
 
     }
 

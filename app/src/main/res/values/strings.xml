@@ -20,5 +20,6 @@
 
     <!-- Default api key -->
     <string name="default_key">AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM</string>
+    <string name="hours_unavailable">Open Hours Unavailable</string>
 
 </resources>
