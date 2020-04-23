@@ -3,7 +3,7 @@
 I spent 2 days working on the project. I had to revise android and I wrote the MainActivty
 class in kotlin which I had not used previously. If not for the time spent learning I think
 I would have achieved more in that time. The motivation for using Kotlin was to get familar
-with the language as recomended. I have moved of the project for now (23/04/2020) because 
+with the language as recomended. I have moved off the project for now (23/04/2020) because 
 of other immediate deadlines.
 
 I would implement the following changes to my solution:
