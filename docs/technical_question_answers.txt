@@ -1,9 +1,10 @@
 1)
 
-I spent 3 days working on the project. I had to revise android and I wrote the MainActivty
+I spent 2 days working on the project. I had to revise android and I wrote the MainActivty
 class in kotlin which I had not used previously. If not for the time spent learning I think
 I would have achieved more in that time. The motivation for using Kotlin was to get familar
-with the language as recomended.
+with the language as recomended. I have moved of the project for now (23/04/2020) because 
+of other immediate deadlines.
 
 I would implement the following changes to my solution:
 	-A slider enabling the user to change km radius of search distance.
@@ -25,6 +26,14 @@ select a simple button icon/image without having to download one or make my own.
 
 3)
 
+If due to a bug I would debug the code in an IDE. I would ensure all long processes are run asyncronously and not on a main/UI thread.
+If it is inefficency I would look at the code to evaluate its time complexity (Big O notation) and see if there are uneeded loops or
+if a better algorithm could be used. Often use of the right type of data structure can help this.
+
+I have read that code profiling tools can be used for this task. I have not used one myself yet but they are designed for evaluating performance of code.
+
+As another idea, I am aware that large tasks can be split to be done in parallel if you have the resource for it. 
+One could think about splitting a large data processing operation over multiple machines using MapReduce or something similar.
 	
 
 	
