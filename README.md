@@ -16,4 +16,4 @@ Suggested steps for running:
 * Click the key icon in the top right to change API key
 * Enter a decimal value in both input fields and click the 'Search' button to get results
 * Click the 'Use Current Location' button to fill the inputs with your current location
-* Any results returned by the Places API with be displayed below in a recycler view sorted by rating.
+* Any results returned by the Places API will be displayed below in a recycler view sorted by rating.
