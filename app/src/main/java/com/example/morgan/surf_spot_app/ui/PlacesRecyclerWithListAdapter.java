@@ -7,6 +7,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.morgan.surf_spot_app.R;
@@ -116,6 +117,10 @@ public class PlacesRecyclerWithListAdapter extends
 
     public List<Place> getPlaces(){
         return this.places;
+    }
+
+    public ArrayList<Place> getPlacesArrayList(){
+        return new ArrayList<>(this.places);
     }
 
     void changeDataSet(List<Place> places){

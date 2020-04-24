@@ -43,4 +43,12 @@ public class PlaceTest {
         Assert.assertEquals(sortedPlaces.get(2), places.get(2));
     }
 
+    /**
+     * Checks sorting lists places with null rating last.
+     */
+    @Test
+    public void testCorrectSortingWhenRatingNull(){
+        //todo
+    }
+
 }

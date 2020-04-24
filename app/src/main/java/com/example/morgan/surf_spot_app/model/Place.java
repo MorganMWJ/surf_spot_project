@@ -1,11 +1,13 @@
 package com.example.morgan.surf_spot_app.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Place implements Comparable<Place>{
+public class Place implements Comparable<Place>, Parcelable{
 
     private String name;
     private Double rating;
@@ -65,4 +67,29 @@ public class Place implements Comparable<Place>{
             return 0;
         }
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.name);
+        dest.writeDouble(this.rating);
+        dest.writeParcelable(this.openingHours,0);
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Place createFromParcel(Parcel in) {
+            String nm = in.readString();
+            Double rting = in.readDouble();
+            OpeningHours oh = in.readParcelable(OpeningHours.class.getClassLoader());
+            return new Place(nm, rting, oh);
+        }
+
+        public Place[] newArray(int size) {
+            return new Place[size];
+        }
+    };
 }

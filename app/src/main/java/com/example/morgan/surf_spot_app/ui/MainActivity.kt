@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.Snackbar.LENGTH_INDEFINITE
 import android.support.design.widget.Snackbar.LENGTH_SHORT
@@ -71,6 +72,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        if(savedInstanceState != null){
+            val savedPlaces: ArrayList<Place> = savedInstanceState.getParcelableArrayList("CURRENT_PLACES")
+            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this, savedPlaces)
+        }
+        else{
+            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this)
+        }
+
         /* Handle on inputs */
         this.latInput = findViewById(R.id.edit_lat)
         this.longInput = findViewById(R.id.edit_long)
@@ -96,7 +105,6 @@ class MainActivity : AppCompatActivity() {
 
         /* Initialise recycler view & adapter */
         viewManager = LinearLayoutManager(this)
-        placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this)
         recyclerView = findViewById<RecyclerView>(R.id.place_list).apply {
             // use a linear layout manager
             layoutManager = viewManager
@@ -343,6 +351,14 @@ class MainActivity : AppCompatActivity() {
 
             /* Empty previous list of places */
             this.placesRecyclerAdapter.clearDataSet()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        if (outState != null) {
+            outState.putParcelableArrayList("CURRENT_PLACES",
+                    placesRecyclerAdapter.placesArrayList)
         }
     }
 

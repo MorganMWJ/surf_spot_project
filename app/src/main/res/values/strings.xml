@@ -17,7 +17,7 @@
     <string name="change_key_dialog_title">Change Google Places API Key</string>
     <string name="request_issue_text">Problem with request:</string>
     <string name="zero_results_text">Zero Places Returned</string>
-    <string name="request_sucess_text">Places Returned</string>
+    <string name="request_sucess_text"> Places Returned</string>
 
     <!-- Default api key -->
     <string name="default_key">AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM</string>
