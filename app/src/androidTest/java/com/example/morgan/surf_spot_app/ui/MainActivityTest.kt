@@ -1,13 +1,17 @@
 package com.example.morgan.surf_spot_app.ui
 
 
+
+import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.EditText
 import androidx.test.annotation.UiThreadTest
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.rule.ActivityTestRule
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.ResultWrapper
-import kotlinx.android.synthetic.main.activity_main.view.*
 import org.junit.After
 import org.junit.Before
 
@@ -15,11 +19,9 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import java.util.ArrayList
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.instanceOf
 
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.rule.ActivityTestRule
 
 class MainActivityTest {
 
@@ -38,7 +40,7 @@ class MainActivityTest {
         assertNotNull(view)
     }
 
-    @Test
+
     @UiThreadTest
     fun testUpdateListView_goodResult(){
 
@@ -51,11 +53,17 @@ class MainActivityTest {
         /* Call handle result */
         activity!!.handleResult(resWrapper)
 
+        /* Check places are set in Recycler View adapter */
+        var rv: RecyclerView = activity!!.findViewById(R.id.place_list)
+        if(rv.adapter is  PlacesRecyclerWithListAdapter){
+            assertEquals(2, rv.adapter!!.itemCount)
+        }
+
         /* Check places are displayed in recycler view */
 
+
         /* Check alternate result text view is 'gone' */
-        onView(withId(R.id.results_text))
-                .check(doesNotExist())
+        onView(withId(R.id.results_text)).check(doesNotExist())
 
 
     }

@@ -48,6 +48,13 @@ public class Place implements Comparable<Place>{
      *  */
     @Override
     public int compareTo(@NonNull Place other) {
+        if(this.rating == null){
+            return 1;
+        }
+        if(other.rating == null){
+            return -1;
+        }
+
         if(this.rating < other.rating){
             return 1;
         }

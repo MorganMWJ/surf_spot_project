@@ -75,7 +75,9 @@ public class PlacesRecyclerWithListAdapter extends
 
         void bindDataSet(Place p){
             nameView.setText(p.getName());
-            ratingView.setText(p.getRating().toString());
+            if(p.getRating() != null) {
+                ratingView.setText(p.getRating().toString());
+            }
             if(p.getOpeningHours() != null){
                 String openHourStr = p.getOpeningHours().toHtmlString();
                 hoursView.setText(Html.fromHtml(openHourStr));
@@ -110,6 +112,10 @@ public class PlacesRecyclerWithListAdapter extends
         } else {
             return 0;
         }
+    }
+
+    public List<Place> getPlaces(){
+        return this.places;
     }
 
     void changeDataSet(List<Place> places){

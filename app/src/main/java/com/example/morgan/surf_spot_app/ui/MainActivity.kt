@@ -10,6 +10,9 @@ import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.design.widget.Snackbar.LENGTH_INDEFINITE
+import android.support.design.widget.Snackbar.LENGTH_SHORT
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -37,13 +40,23 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
+    /* Latitude & longitude of device */
     private var latitude: Double = 50.4164582
     private var longitude: Double = -5.100202299999978
+
+    /* Input Fields */
+    private lateinit var latInput: EditText
+    private lateinit var longInput: EditText
+
+
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
     private var apiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
-    private var placesRecyclerAdapter: PlacesRecyclerWithListAdapter
-            = PlacesRecyclerWithListAdapter(this@MainActivity)
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var placesRecyclerAdapter: PlacesRecyclerWithListAdapter
+    private lateinit var viewManager: RecyclerView.LayoutManager
+
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -58,6 +71,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /* Handle on inputs */
+        this.latInput = findViewById(R.id.edit_lat)
+        this.longInput = findViewById(R.id.edit_long)
+
         /* Set functionality of buttons */
         var loadLocationButton: Button = findViewById(R.id.load_location_button)
         loadLocationButton.setOnClickListener {
@@ -66,18 +83,26 @@ class MainActivity : AppCompatActivity() {
 
         var searchButton: Button = findViewById(R.id.run_search_button)
         searchButton.setOnClickListener{
-            /* If we can parse inputs */
-           if(parseValues()){
-               /* Run the search to get a list places */
-               runSearch()
-           }
+            if(latInput.text.toString().isNotEmpty() && longInput.text.toString().isNotEmpty()) {
+                /* Run the search to get a list places */
+                runSearch()
+            }
+            else{
+                Snackbar.make(findViewById(R.id.root_layout),
+                        R.string.empty_field_exception,
+                        LENGTH_SHORT).show()
+            }
         }
 
-        /* Initialise recycler view adapter */
-        var listPlaces: RecyclerView = findViewById(R.id.place_list)
-        listPlaces.adapter = placesRecyclerAdapter
-        listPlaces.layoutManager = LinearLayoutManager(this)
-
+        /* Initialise recycler view & adapter */
+        viewManager = LinearLayoutManager(this)
+        placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this)
+        recyclerView = findViewById<RecyclerView>(R.id.place_list).apply {
+            // use a linear layout manager
+            layoutManager = viewManager
+            // specify an viewAdapter
+            adapter = placesRecyclerAdapter
+        }
 
         /* Set up location manager & listener */
         locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -179,9 +204,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             /* Alert user to key change */
-            Toast.makeText(this@MainActivity,
-                    "API key changed: " + this.apiKey
-                    , Toast.LENGTH_SHORT).show()
+            Snackbar.make(findViewById(R.id.root_layout),
+                    getString(R.string.key_change_text) + this.apiKey,
+                    LENGTH_INDEFINITE).show()
         }
 
         /* Negative button closes dialog */
@@ -198,54 +223,26 @@ class MainActivity : AppCompatActivity() {
      */
     private fun loadLocationFromGPS(){
         /* Display values in text fields */
-        var latTextField: EditText = findViewById(R.id.edit_lat)
-        latTextField.setText(""+this.latitude)
-        var longTextField: EditText = findViewById(R.id.edit_long)
-        longTextField.setText(""+this.longitude)
+        this.latInput.setText(""+this.latitude)
+        this.longInput.setText(""+this.longitude)
 
         /* Notify user of success */
         Toast.makeText(this@MainActivity, "Loaded location from GPS.", Toast.LENGTH_SHORT).show()
     }
 
     /**
-     * Parse both EditText inputs as Doubles.
-     * Returns true if parsed false otherwise.
+     * Builds the set of query parameters and calls the Places API
      */
-    private fun parseValues(): Boolean {
-
-        var isParsed = false
-
-        /* Get EditText fields */
-        val latText = findViewById<EditText>(R.id.edit_lat).text.toString()
-        val longText = findViewById<EditText>(R.id.edit_long).text.toString()
-
-        /* Parse their values as doubles if not empty */
-        if (!latText.isEmpty() && !longText.isEmpty())
-            try {
-                this.latitude = java.lang.Double.parseDouble(latText)
-                this.longitude = java.lang.Double.parseDouble(longText)
-                isParsed = true
-            } catch (e1: Exception) {
-                Toast.makeText(this@MainActivity, getString(R.string.parse_double_exception), Toast.LENGTH_SHORT).show()
-                e1.printStackTrace()
-            }
-        else
-            Toast.makeText(this@MainActivity, getString(R.string.empty_field_exception), Toast.LENGTH_SHORT).show()
-
-        return isParsed
-    }
-
     private fun runSearch() {
 
         /* Lat/Long as location string */
-        val location: String = this.latitude.toString() + "," + this.longitude.toString()
-        //val location: String = "50.4164582,-5.100202299999978"
+        val location: String = latInput.text.toString() + "," + longInput.text.toString()
 
         /* Create map of query parameter key-values */
         val queryParams: Map<String, String> = mapOf(
                 "radius" to 1000.toString() ,
                 "type" to "lodging", //REPLACE WIRH 'lodging'
-                "keyword" to "surf",
+//                "keyword" to "surf",
                 "key" to this.apiKey)
 
         /*  Get a logger */
@@ -276,7 +273,9 @@ class MainActivity : AppCompatActivity() {
 
                 /* If not successful print out status code and return */
                 if (!response.isSuccessful) {
-                    alterResultsTextView("Code: " + response.code(), true)
+                    var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+                            "Code: " + response.code(), LENGTH_INDEFINITE)
+                    sb.show()
                     return
                 }
 
@@ -290,12 +289,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<ResultWrapper>, t: Throwable) {
-                /* On call failure print our error message */
-                alterResultsTextView(t.message, true)
+                /* On call failure show error message */
+                var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+                        t.message.toString(), LENGTH_INDEFINITE)
+                sb.show()
             }
         })
-        Toast.makeText(this@MainActivity, "You clicked search.", Toast.LENGTH_SHORT).show()
 
+        /* Notify user of search */
+        Toast.makeText(this@MainActivity, "Searching Places.", Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -307,44 +309,41 @@ class MainActivity : AppCompatActivity() {
         /* If we have places in our results */
         if (result.results != null && !result.results.isEmpty()) {
 
+            /* Tell the user how many results were returned */
+            var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+                    (result.results.size.toString() + getString(R.string.request_sucess_text)),
+                    LENGTH_INDEFINITE)
+            sb.show()
+
             /* Update our view to display them */
             this.placesRecyclerAdapter.changeDataSet(result.results)
-            alterResultsTextView(null, false)
         }
 
         /* If no places */
         else if(result.status == "ZERO_RESULTS"){
 
             /* Tell user there were no results */
-            alterResultsTextView("Zero Results", true)
+            var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+                    getString(R.string.zero_results_text), LENGTH_INDEFINITE)
+            sb.show()
+
             /* Empty previous list of places */
             this.placesRecyclerAdapter.clearDataSet()
         }
 
-        /* If api key wrong */
-        else if(result.status == "REQUEST_DENIED"){
+        /* If other issue {ZERO_RESULTS,OVER_QUERY_LIMIT,REQUEST_DENIED..etc.}  */
+        else{
+
             /* Tell user there was a problem with the request */
-            alterResultsTextView(
-                    "Problem with api or key.\nStatus: " + result.status, true)
+            var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+                    getString(R.string.request_issue_text) + result.status,
+                    LENGTH_INDEFINITE)
+            //sb.view.setBackgroundColor(0x9E1A1A)
+            sb.show()
+
             /* Empty previous list of places */
             this.placesRecyclerAdapter.clearDataSet()
         }
-    }
-
-    /**
-     * Helper function to edit remove duplicate code.
-     * Edits text display should result not return places.
-     */
-    private fun alterResultsTextView(message: String?, isShown: Boolean){
-        var txtView = findViewById<TextView>(R.id.results_text)
-
-        if(message != null)
-            txtView.text = message
-
-        if(isShown)
-            txtView.visibility=View.VISIBLE
-        else
-            txtView.visibility = View.GONE
     }
 
 }
