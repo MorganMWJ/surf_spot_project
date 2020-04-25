@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Search Surf Places</string>
+    <string name="app_name">Surf Places</string>
 
     <!-- Main Activity Strings -->
     <string name="hint_word">Enter a location (latitude/longitude)</string>
@@ -25,6 +25,8 @@
     <!-- Places content strings -->
     <string name="hours_unavailable">Open Hours Unavailable</string>
     <string name="key_change_text">API key changed:</string>
+    <string name="map_button_title">Launch Map View</string>
+    <string name="search_button_title">Search Input</string>
 
 
 </resources>

@@ -48,7 +48,37 @@ public class PlaceTest {
      */
     @Test
     public void testCorrectSortingWhenRatingNull(){
-        //todo
+        Place nullPlace1 = new Place("Null", null, null);
+        Place nullPlace2 = new Place("Null", null, null);
+        Place goodPlace = new Place("Good", 3.2, null);
+        Place betterPlace = new Place("Better", 4.3, null);
+        Place bestPlace = new Place("Best", 4.9, null);
+
+        /* Create unsorted list of places */
+        List<Place> places = new ArrayList<>();
+        places.add(nullPlace1);
+        places.add(nullPlace2);
+        places.add(betterPlace);
+        places.add(goodPlace);
+        places.add(bestPlace);
+
+        /* Create sorted list of same places */
+        List<Place> sortedPlaces = new ArrayList<>();
+        sortedPlaces.add(bestPlace);
+        sortedPlaces.add(betterPlace);
+        sortedPlaces.add(goodPlace);
+        sortedPlaces.add(nullPlace1);
+        sortedPlaces.add(nullPlace2);
+
+        /* Sort the unsorted list */
+        Collections.sort(places);
+
+        /* Assert that when sorted the first list matches the expected 2nd list */
+        Assert.assertEquals(sortedPlaces.get(0), places.get(0));
+        Assert.assertEquals(sortedPlaces.get(1), places.get(1));
+        Assert.assertEquals(sortedPlaces.get(2), places.get(2));
+
+        /* We do not care the order of null rated places so long as they are not before the others */
     }
 
 }

@@ -2,7 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- "Mark Favorite", should appear as action button if possible -->
+    <!-- Search Input Button -->
+    <item android:id="@+id/search_icon"
+        android:icon="@drawable/ic_search_white_48dp"
+        android:title="@string/search_button_title"
+        app:showAsAction="ifRoom"/>
+
+    <!-- Map Launch Button -->
+    <item
+        android:id="@+id/map_button"
+        android:icon="@drawable/ic_map_white_48dp"
+        android:title="@string/map_button_title"
+        app:showAsAction="ifRoom"/>
+
+    <!-- Key Change -->
     <item
         android:id="@+id/key_change_button"
         android:icon="@drawable/ic_api_key_white_48dp"

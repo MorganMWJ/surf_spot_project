@@ -50,6 +50,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var longInput: EditText
 
 
+    /* If input fields are currently shown */
+    private var displayingSearchSection: Boolean = true
+
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
     private var apiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
@@ -177,6 +180,16 @@ class MainActivity : AppCompatActivity() {
             if (item.itemId == R.id.key_change_button) {
                 /* Prompt user for key input */
                 buildChangeApiKeyDialog()
+            }
+            if (item.itemId == R.id.search_icon){
+                if(this.displayingSearchSection) {
+                    findViewById<GridLayout>(R.id.search_section_layout).visibility = View.GONE
+                    displayingSearchSection = false
+                }
+                else{
+                    findViewById<GridLayout>(R.id.search_section_layout).visibility = View.VISIBLE
+                    displayingSearchSection = true
+                }
             }
         }
 

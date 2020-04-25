@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/place_rating_text_view"
             android:textSize="20sp"
             android:textColor="@color/colorPrimaryDark"/>
 
@@ -25,9 +26,10 @@
             android:id="@+id/place_rating_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_padding"
             android:layout_alignParentEnd="true"
             android:textSize="25sp"
-            android:drawableLeft="@drawable/ic_star_yellow_48dp"/>
+            android:drawableEnd="@drawable/ic_star_yellow_48dp"/>
 
         <TextView
             android:id="@+id/place_open_hours_text_view"
@@ -35,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/place_rating_text_view"
+            android:padding="@dimen/small_padding"
             android:textSize="15sp"
             android:textColor="#A9A9A9"/>
 
