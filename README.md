@@ -10,6 +10,11 @@ Suggested steps for running:
 * Connect a mobile device with a USB cable (or use an emulator)
 * Build and run the app
 
+Note: The current app does not query with the keyword set to 'surf'. 
+This is because when querying a location near Fistral beach zero results are returned when using the keyword 'surf'.
+If wanting the keyword 'surf' to be included like specified in the brief, uncomment line 266 in MainActivity.kt.
+
+  Change this line `//"keyword" to "surf",` to this `"keyword" to "surf",`.
 
 # Instructions for **Usage**
 
