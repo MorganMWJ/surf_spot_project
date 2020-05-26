@@ -3,9 +3,9 @@ package com.example.morgan.surf_spot_app.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
+import androidx.annotation.NonNull;
 
 public class Place implements Comparable<Place>, Parcelable{
 

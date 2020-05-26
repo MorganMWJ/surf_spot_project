@@ -7,27 +7,30 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.support.design.widget.Snackbar
-import android.support.design.widget.Snackbar.LENGTH_INDEFINITE
-import android.support.design.widget.Snackbar.LENGTH_SHORT
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.Toolbar
+
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import android.widget.Toast.LENGTH_SHORT
+
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.PlacesAPI
 import com.example.morgan.surf_spot_app.model.ResultWrapper
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
+import com.google.android.material.snackbar.Snackbar
+
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -35,7 +38,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Retrofit
-import java.util.*
+
 import kotlin.collections.ArrayList
 
 
@@ -64,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
             }
@@ -102,7 +105,7 @@ class MainActivity : AppCompatActivity() {
             else{
                 Snackbar.make(findViewById(R.id.root_layout),
                         R.string.empty_field_exception,
-                        LENGTH_SHORT).show()
+                        Snackbar.LENGTH_SHORT).show()
             }
         }
 
@@ -227,7 +230,7 @@ class MainActivity : AppCompatActivity() {
             /* Alert user to key change */
             Snackbar.make(findViewById(R.id.root_layout),
                     getString(R.string.key_change_text) + this.apiKey,
-                    LENGTH_INDEFINITE).show()
+                    Snackbar.LENGTH_INDEFINITE).show()
         }
 
         /* Negative button closes dialog */
@@ -295,7 +298,7 @@ class MainActivity : AppCompatActivity() {
                 /* If not successful print out status code and return */
                 if (!response.isSuccessful) {
                     var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
-                            "Code: " + response.code(), LENGTH_INDEFINITE)
+                            "Code: " + response.code(), Snackbar.LENGTH_INDEFINITE)
                     sb.show()
                     return
                 }
@@ -333,7 +336,7 @@ class MainActivity : AppCompatActivity() {
             /* Tell the user how many results were returned */
             var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
                     (result.results.size.toString() + getString(R.string.request_sucess_text)),
-                    LENGTH_INDEFINITE)
+                    Snackbar.LENGTH_INDEFINITE)
             sb.show()
 
             /* Update our view to display them */
@@ -345,7 +348,7 @@ class MainActivity : AppCompatActivity() {
 
             /* Tell user there were no results */
             var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
-                    getString(R.string.zero_results_text), LENGTH_INDEFINITE)
+                    getString(R.string.zero_results_text), Snackbar.LENGTH_INDEFINITE)
             sb.show()
 
             /* Empty previous list of places */
@@ -358,7 +361,7 @@ class MainActivity : AppCompatActivity() {
             /* Tell user there was a problem with the request */
             var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
                     getString(R.string.request_issue_text) + result.status,
-                    LENGTH_INDEFINITE)
+                    Snackbar.LENGTH_INDEFINITE)
             //sb.view.setBackgroundColor(0x9E1A1A)
             sb.show()
 
@@ -367,12 +370,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (outState != null) {
-            outState.putParcelableArrayList("CURRENT_PLACES",
-                    placesRecyclerAdapter.placesArrayList)
-        }
+        outState.putParcelableArrayList("CURRENT_PLACES",
+                placesRecyclerAdapter.placesArrayList)
     }
 
 }

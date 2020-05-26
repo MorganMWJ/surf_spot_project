@@ -1,23 +1,22 @@
 package com.example.morgan.surf_spot_app.ui;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.morgan.surf_spot_app.R;
 import com.example.morgan.surf_spot_app.model.OpeningHours;
 import com.example.morgan.surf_spot_app.model.Place;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class PlacesRecyclerWithListAdapter extends
         RecyclerView.Adapter<PlacesRecyclerWithListAdapter.ViewHolder> {
