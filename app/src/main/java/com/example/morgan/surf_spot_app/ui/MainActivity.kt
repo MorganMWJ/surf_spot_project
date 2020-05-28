@@ -2,45 +2,38 @@ package com.example.morgan.surf_spot_app.ui
 
 import android.Manifest
 import android.content.Context
-import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.PersistableBundle
-
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import android.widget.Toast.LENGTH_SHORT
-
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.PlacesAPI
 import com.example.morgan.surf_spot_app.model.ResultWrapper
-import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
 import com.google.android.material.snackbar.Snackbar
-
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-import kotlin.collections.ArrayList
-
+/* Key for list intent content */
+const val LIST_INTENT_KEY = "com.example.surfspotapp.LIST"
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,16 +45,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var latInput: EditText
     private lateinit var longInput: EditText
 
-
     /* If input fields are currently shown */
     private var displayingSearchSection: Boolean = true
 
+    /* Location Manager & Listener */
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
+
+    /* Google Places API key */
     private var apiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var placesRecyclerAdapter: PlacesRecyclerWithListAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
+
+//    /* Recycler View */
+//    private lateinit var recyclerView: RecyclerView
+//    private lateinit var placesRecyclerAdapter: PlacesRecyclerWithListAdapter
+//    private lateinit var viewManager: RecyclerView.LayoutManager
 
 
 
@@ -78,13 +75,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if(savedInstanceState != null){
-            val savedPlaces: ArrayList<Place> = savedInstanceState.getParcelableArrayList("CURRENT_PLACES")
-            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this, savedPlaces)
-        }
-        else{
-            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this)
-        }
+//        /* Reload instance state upon screen re-orientation */
+//        if(savedInstanceState != null){
+//            val savedPlaces: ArrayList<Place> = savedInstanceState.getParcelableArrayList("CURRENT_PLACES")
+//            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this, savedPlaces)
+//        }
+//        else{
+//            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this)
+//        }
 
         /* Handle on inputs */
         this.latInput = findViewById(R.id.edit_lat)
@@ -109,14 +107,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        /* Initialise recycler view & adapter */
-        viewManager = LinearLayoutManager(this)
-        recyclerView = findViewById<RecyclerView>(R.id.place_list).apply {
-            // use a linear layout manager
-            layoutManager = viewManager
-            // specify an viewAdapter
-            adapter = placesRecyclerAdapter
-        }
+//        /* Initialise recycler view & adapter */
+//        viewManager = LinearLayoutManager(this)
+//        recyclerView = findViewById<RecyclerView>(R.id.place_list).apply {
+//            // use a linear layout manager
+//            layoutManager = viewManager
+//            // specify an viewAdapter
+//            adapter = placesRecyclerAdapter
+//        }
 
         /* Set up location manager & listener */
         locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -315,7 +313,7 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(call: Call<ResultWrapper>, t: Throwable) {
                 /* On call failure show error message */
                 var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
-                        t.message.toString(), LENGTH_INDEFINITE)
+                        t.message.toString(), Snackbar.LENGTH_INDEFINITE)
                 sb.show()
             }
         })
@@ -331,16 +329,19 @@ class MainActivity : AppCompatActivity() {
     fun handleResult(result: ResultWrapper){
 
         /* If we have places in our results */
-        if (result.results != null && !result.results.isEmpty()) {
+        if (result.results != null && result.results.isNotEmpty()) {
 
-            /* Tell the user how many results were returned */
-            var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
-                    (result.results.size.toString() + getString(R.string.request_sucess_text)),
-                    Snackbar.LENGTH_INDEFINITE)
-            sb.show()
+            /* Convert result to (parcelable) ArrayList  */
+            val placesResult = ArrayList<Place>(result.results)
 
-            /* Update our view to display them */
-            this.placesRecyclerAdapter.changeDataSet(result.results)
+            /* Launch intent to send result to ListActivity */
+            val listResultsIntent = Intent(this, ListActivity::class.java).apply {
+                /* Bundle up parcelable array list of results to send as extras to list activity  */
+                val bundle = Bundle()
+                bundle.putParcelableArrayList("places", placesResult)
+                putExtra(LIST_INTENT_KEY, bundle)
+            }
+            startActivity(listResultsIntent)
         }
 
         /* If no places */
@@ -351,8 +352,8 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.zero_results_text), Snackbar.LENGTH_INDEFINITE)
             sb.show()
 
-            /* Empty previous list of places */
-            this.placesRecyclerAdapter.clearDataSet()
+//            /* Empty previous list of places */
+//            this.placesRecyclerAdapter.clearDataSet()
         }
 
         /* If other issue {ZERO_RESULTS,OVER_QUERY_LIMIT,REQUEST_DENIED..etc.}  */
@@ -365,15 +366,15 @@ class MainActivity : AppCompatActivity() {
             //sb.view.setBackgroundColor(0x9E1A1A)
             sb.show()
 
-            /* Empty previous list of places */
-            this.placesRecyclerAdapter.clearDataSet()
+//            /* Empty previous list of places */
+//            this.placesRecyclerAdapter.clearDataSet()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList("CURRENT_PLACES",
-                placesRecyclerAdapter.placesArrayList)
+//        outState.putParcelableArrayList("CURRENT_PLACES",
+//                placesRecyclerAdapter.placesArrayList)
     }
 
 }

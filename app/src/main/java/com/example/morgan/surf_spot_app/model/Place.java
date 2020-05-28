@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 
 public class Place implements Comparable<Place>, Parcelable{
 
+    private static final double UNKNOWN_RATING = 0.0;
+
     private String name;
     private Double rating;
 
@@ -76,7 +78,12 @@ public class Place implements Comparable<Place>, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
-        dest.writeDouble(this.rating);
+        if(this.rating==null) {
+            dest.writeDouble(UNKNOWN_RATING);
+        }
+        else{
+            dest.writeDouble(this.rating);
+        }
         dest.writeParcelable(this.openingHours,0);
     }
 

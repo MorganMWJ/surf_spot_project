@@ -77,12 +77,12 @@
         android:visibility="gone"/>
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/place_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:scrollbars="vertical"/>
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/place_list"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_marginStart="8dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:scrollbars="vertical"/>-->
 
 </LinearLayout>

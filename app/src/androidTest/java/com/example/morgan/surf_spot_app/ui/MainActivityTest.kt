@@ -1,31 +1,26 @@
 package com.example.morgan.surf_spot_app.ui
 
-
-
-import android.support.v7.widget.RecyclerView
-import android.view.View
-import androidx.test.annotation.UiThreadTest
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.example.morgan.surf_spot_app.R
-import com.example.morgan.surf_spot_app.model.Place
-import com.example.morgan.surf_spot_app.model.ResultWrapper
 import org.junit.After
 import org.junit.Before
-
-import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
-import java.util.ArrayList
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.runner.RunWith
 
-
+@RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
-    @Rule @JvmField val mainActivityRule: ActivityTestRule<MainActivity> = ActivityTestRule<MainActivity>(MainActivity::class.java)
+    @Rule @JvmField val mainActivityRule: ActivityTestRule<MainActivity> = ActivityTestRule(MainActivity::class.java)
 
     private var activity: MainActivity?  = null
 
@@ -36,37 +31,145 @@ class MainActivityTest {
 
     @Test
     fun testLaunch(){
-        var view: View? = activity!!.findViewById(R.id.edit_lat)
-        assertNotNull(view)
+//        var view: View? = activity!!.findViewById(R.id.edit_lat)
+//        assertNotNull(view)
+        ActivityScenario.launch(MainActivity::class.java)
+    }
+
+    @Test
+    fun onLaunchCheckLatitudeInputIsDisplayed() {
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* Check input field for latitude is displayed */
+        onView(withId(R.id.edit_lat)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onLaunchCheckLongitudeInputIsDisplayed() {
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* Check input field for latitude is displayed */
+        onView(withId(R.id.edit_long)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onLaunchSearchButtonIsDisplayed() {
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* Check view with 'Search' text is displayed */
+        onView(withText(R.string.search_button_text))
+                .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun checkUserIsNotifiedOfValidationIssuesWhenLatitudeAndLongitudeAreEmpty(){
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* Click search button */
+        onView(withId(R.id.run_search_button))
+                .perform(click())
+
+        /* Check Snackbar alert is displayed */
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(withText(R.string.empty_field_exception)))
+    }
+
+    @Test
+    fun checkUserIsNotifiedOfValidationIssuesWhenLatitudeIsEmpty(){
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* Enter value for longitude */
+        onView(withId(R.id.edit_long))
+                .perform(typeText("11"))
+
+        /* Click search button */
+        onView(withId(R.id.run_search_button))
+                .perform(click())
+
+        /* Check Snackbar alert is displayed */
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(withText(R.string.empty_field_exception)))
+    }
+
+    @Test
+    fun checkUserIsNotifiedOfValidationIssuesWhenLongitudeIsEmpty(){
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* Enter value for latitude */
+        onView(withId(R.id.edit_lat))
+                .perform(typeText("11"))
+
+        /* Click search button */
+        onView(withId(R.id.run_search_button))
+                .perform(click())
+
+        /* Check Snackbar alert is displayed */
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(withText(R.string.empty_field_exception)))
+    }
+
+    @Test
+    fun checkListActivityIsLaunchedWithResultsDisplayedUponSearch(){
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* This test searches for the coordinates of Fistral Beach */
+        val fistralLat = 50.4165
+        val fistralLong = 5.1002
+
+        /* Enter value for latitude */
+        onView(withId(R.id.edit_lat))
+                .perform(typeText(fistralLat.toString()))
+
+        /* Enter value for longitude */
+        onView(withId(R.id.edit_long))
+                .perform(typeText(fistralLong.toString()))
+
+        /* Click search button */
+        onView(withId(R.id.run_search_button))
+                .perform(click())
+
+        /* Check ListActivity is open */
+        intended(hasComponent(ListActivity::class.java.name))
+
     }
 
 
-    @UiThreadTest
-    fun testUpdateListView_goodResult(){
-
-        /* Create ResultWrapper object with places */
-        val places = ArrayList<Place>()
-        places.add(Place("Morgan's Place", 3.2, null))
-        places.add(Place("Josh's Place", 4.2, null))
-        var resWrapper: ResultWrapper = ResultWrapper(places, "OK")
-
-        /* Call handle result */
-        activity!!.handleResult(resWrapper)
-
-        /* Check places are set in Recycler View adapter */
-        var rv: RecyclerView = activity!!.findViewById(R.id.place_list)
-        if(rv.adapter is  PlacesRecyclerWithListAdapter){
-            assertEquals(2, rv.adapter!!.itemCount)
-        }
-
-        /* Check places are displayed in recycler view */
 
 
-        /* Check alternate result text view is 'gone' */
-        onView(withId(R.id.results_text)).check(doesNotExist())
 
-
-    }
+//    @UiThreadTest
+//    fun testUpdateListView_goodResult(){
+//
+//        /* Create ResultWrapper object with places */
+//        val places = ArrayList<Place>()
+//        places.add(Place("Morgan's Place", 3.2, null))
+//        places.add(Place("Josh's Place", 4.2, null))
+//        var resWrapper: ResultWrapper = ResultWrapper(places, "OK")
+//
+//        /* Call handle result */
+//        activity!!.handleResult(resWrapper)
+//
+//        /* Check places are set in Recycler View adapter */
+//        var rv: RecyclerView = activity!!.findViewById(R.id.place_list)
+//        if(rv.adapter is  PlacesRecyclerWithListAdapter){
+//            assertEquals(2, rv.adapter!!.itemCount)
+//        }
+//
+//        /* Check places are displayed in recycler view */
+//
+//
+//        /* Check alternate result text view is 'gone' */
+//        onView(withId(R.id.results_text)).check(doesNotExist())
+//
+//
+//    }
 
     @Test
     fun testUpdateListView_zeroResultsResult(){
