@@ -336,11 +336,11 @@ class MainActivity : AppCompatActivity() {
 
             /* Launch intent to send result to ListActivity */
             val listResultsIntent = Intent(this, ListActivity::class.java).apply {
-                /* Bundle up parcelable array list of results to send as extras to list activity  */
-                val bundle = Bundle()
-                bundle.putParcelableArrayList("places", placesResult)
-                putExtra(LIST_INTENT_KEY, bundle)
+                /* Add parcelable array list as intent extra to send to list activity  */
+                putParcelableArrayListExtra("com.example.surfspotapp.LIST", placesResult)
             }
+
+            /* Start ListActivity using Intent */
             startActivity(listResultsIntent)
         }
 

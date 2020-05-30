@@ -41,14 +41,12 @@ public class ListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(viewManager);
         recyclerView.setAdapter(placesRecyclerAdapter);
 
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            ArrayList<Place> surfPlaces = bundle.getParcelableArrayList("places");
+        ArrayList<Place> surfPlaces = getIntent().getParcelableArrayListExtra("com.example.surfspotapp.LIST");
+        if (surfPlaces != null) {
 
             /* Tell the user how many results were returned */
-            Snackbar sb = Snackbar.make(findViewById(R.id.root_layout),
-                    (surfPlaces.size() + getString(R.string.request_sucess_text)),
-                    Snackbar.LENGTH_INDEFINITE);
+            String alertText = surfPlaces.size() + " " + getString(R.string.request_sucess_text);
+            Snackbar sb = Snackbar.make(findViewById(R.id.place_list), alertText, Snackbar.LENGTH_INDEFINITE);
             sb.show();
 
             /* Update our view to display them */
