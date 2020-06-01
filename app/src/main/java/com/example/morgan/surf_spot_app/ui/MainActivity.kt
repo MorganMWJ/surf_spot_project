@@ -17,8 +17,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.PlacesAPI
@@ -44,21 +42,29 @@ class MainActivity : AppCompatActivity() {
     /* Input Fields */
     private lateinit var latInput: EditText
     private lateinit var longInput: EditText
+    private lateinit var keyInput: EditText
 
-    /* If input fields are currently shown */
-    private var displayingSearchSection: Boolean = true
+    /* If extra settings input fields are currently shown */
+    private var displayingSettingsSection: Boolean = true
+
+    /* If displaying change API key section */
+    private var displayingChangeApiKeySection: Boolean = true
 
     /* Location Manager & Listener */
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
 
-    /* Google Places API key */
-    private var apiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
+    /* Default Google Places API key */
+    private val apiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
 
-//    /* Recycler View */
-//    private lateinit var recyclerView: RecyclerView
-//    private lateinit var placesRecyclerAdapter: PlacesRecyclerWithListAdapter
-//    private lateinit var viewManager: RecyclerView.LayoutManager
+    /* User set Google Places API key */
+    private var currentApiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
+
+    /* Inputs for extra options section */
+    private lateinit var radiusInput: SeekBar
+    private lateinit var surfKeywordInput: CheckBox
+    private lateinit var placeTypeInput: Spinner
+
 
 
 
@@ -75,25 +81,40 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        /* Reload instance state upon screen re-orientation */
-//        if(savedInstanceState != null){
-//            val savedPlaces: ArrayList<Place> = savedInstanceState.getParcelableArrayList("CURRENT_PLACES")
-//            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this, savedPlaces)
-//        }
-//        else{
-//            placesRecyclerAdapter = PlacesRecyclerWithListAdapter(this)
-//        }
-
         /* Handle on inputs */
         this.latInput = findViewById(R.id.edit_lat)
         this.longInput = findViewById(R.id.edit_long)
+        this.keyInput = findViewById(R.id.edit_key)
+        this.surfKeywordInput = findViewById(R.id.keyword_checkbox)
+        this.placeTypeInput = findViewById(R.id.type_dropdown)
 
-        /* Set functionality of buttons */
+        /* Functionality of radius SeekBar */
+        this.radiusInput = findViewById(R.id.radius_bar)
+        this.radiusInput.progress = 10 // (Default 10000m / 10km)
+        this.radiusInput.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {
+                /* Do Nothing */
+            }
+
+            override fun onStartTrackingTouch(seek: SeekBar) {
+                /* Do Nothing */
+            }
+
+            override fun onStopTrackingTouch(seek: SeekBar) {
+                /* Alert user to successful change of radius */
+                Toast.makeText(this@MainActivity,
+                        "Radius set: " + seek.progress + "km",
+                        Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        /* Set functionality of load location button */
         var loadLocationButton: Button = findViewById(R.id.load_location_button)
         loadLocationButton.setOnClickListener {
             loadLocationFromGPS()
         }
 
+        /* Set functionality of search button */
         var searchButton: Button = findViewById(R.id.run_search_button)
         searchButton.setOnClickListener{
             if(latInput.text.toString().isNotEmpty() && longInput.text.toString().isNotEmpty()) {
@@ -107,14 +128,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-//        /* Initialise recycler view & adapter */
-//        viewManager = LinearLayoutManager(this)
-//        recyclerView = findViewById<RecyclerView>(R.id.place_list).apply {
-//            // use a linear layout manager
-//            layoutManager = viewManager
-//            // specify an viewAdapter
-//            adapter = placesRecyclerAdapter
-//        }
+        /* Set functionality of reset default API key button */
+        var resetKeyButton: Button = findViewById(R.id.reset_default_api_key_button)
+        resetKeyButton.setOnClickListener{
+            currentApiKey = apiKey
+            var currentKeyTextView: TextView = findViewById(R.id.current_key)
+            currentKeyTextView.text = currentApiKey
+        }
+
+        /* Set functionality of set API key button */
+        var setKeyButton: Button = findViewById(R.id.set_api_key_button)
+        setKeyButton.setOnClickListener{
+            /* Get text from new key input */
+            currentApiKey = keyInput.text.toString()
+            var currentKeyTextView: TextView = findViewById(R.id.current_key)
+            currentKeyTextView.text = currentApiKey
+        }
 
         /* Set up location manager & listener */
         locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -178,18 +207,24 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
         if(item != null) {
-            if (item.itemId == R.id.key_change_button) {
-                /* Prompt user for key input */
-                buildChangeApiKeyDialog()
-            }
-            if (item.itemId == R.id.search_icon){
-                if(this.displayingSearchSection) {
-                    findViewById<GridLayout>(R.id.search_section_layout).visibility = View.GONE
-                    displayingSearchSection = false
+            if (item.itemId == R.id.key_change_icon) {
+                if(this.displayingChangeApiKeySection) {
+                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.GONE
+                    displayingChangeApiKeySection = false
                 }
                 else{
-                    findViewById<GridLayout>(R.id.search_section_layout).visibility = View.VISIBLE
-                    displayingSearchSection = true
+                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.VISIBLE
+                    displayingChangeApiKeySection = true
+                }
+            }
+            if (item.itemId == R.id.settings_icon){
+                if(this.displayingSettingsSection) {
+                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.GONE
+                    displayingSettingsSection = false
+                }
+                else{
+                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.VISIBLE
+                    displayingSettingsSection = true
                 }
             }
         }
@@ -197,47 +232,47 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    /**
-     * Build and display input dialog for user to change api key.
-     */
-    private fun buildChangeApiKeyDialog(){
-
-        /* Build alert dialog with title and layout */
-        var builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.change_key_dialog_title)
-        builder.setView(R.layout.change_api_key_dialog_view)
-
-        /* Display current api key */
-        val view = layoutInflater.inflate(R.layout.change_api_key_dialog_view, null)
-        val keyTextView= view.findViewById<TextView>(R.id.api_key_text_view)
-        if (keyTextView != null) {
-            keyTextView.text = this.apiKey
-        }
-        builder.setView(view)
-
-        /* Positive button changes api key to user input */
-        builder.setPositiveButton(R.string.ok){ dialog, _ ->
-            val inputField = (dialog as AlertDialog).findViewById<EditText>(R.id.api_key_input)
-            val input = inputField!!.text.toString()
-
-            /* Set new api key */
-            if(input.isNotEmpty()) {
-                this.apiKey = input
-            }
-
-            /* Alert user to key change */
-            Snackbar.make(findViewById(R.id.root_layout),
-                    getString(R.string.key_change_text) + this.apiKey,
-                    Snackbar.LENGTH_INDEFINITE).show()
-        }
-
-        /* Negative button closes dialog */
-        builder.setNegativeButton("Cancel") {dialog, _ ->
-            dialog.cancel()
-        }
-
-        builder.show()
-    }
+//    /**
+//     * Build and display input dialog for user to change api key.
+//     */
+//    private fun buildChangeApiKeyDialog(){
+//
+//        /* Build alert dialog with title and layout */
+//        var builder: AlertDialog.Builder = AlertDialog.Builder(this)
+//        builder.setTitle(R.string.change_key_dialog_title)
+//        builder.setView(R.layout.change_api_key_dialog_view)
+//
+//        /* Display current api key */
+//        val view = layoutInflater.inflate(R.layout.change_api_key_dialog_view, null)
+//        val keyTextView= view.findViewById<TextView>(R.id.api_key_text_view)
+//        if (keyTextView != null) {
+//            keyTextView.text = this.apiKey
+//        }
+//        builder.setView(view)
+//
+//        /* Positive button changes api key to user input */
+//        builder.setPositiveButton(R.string.ok){ dialog, _ ->
+//            val inputField = (dialog as AlertDialog).findViewById<EditText>(R.id.api_key_input)
+//            val input = inputField!!.text.toString()
+//
+//            /* Set new api key */
+//            if(input.isNotEmpty()) {
+//                this.apiKey = input
+//            }
+//
+//            /* Alert user to key change */
+//            Snackbar.make(findViewById(R.id.root_layout),
+//                    getString(R.string.key_change_text) + this.apiKey,
+//                    Snackbar.LENGTH_INDEFINITE).show()
+//        }
+//
+//        /* Negative button closes dialog */
+//        builder.setNegativeButton("Cancel") {dialog, _ ->
+//            dialog.cancel()
+//        }
+//
+//        builder.show()
+//    }
 
     /**
      * Update the text fields to display device latitude and
@@ -260,12 +295,28 @@ class MainActivity : AppCompatActivity() {
         /* Lat/Long as location string */
         val location: String = latInput.text.toString() + "," + longInput.text.toString()
 
+        /* Search Radius for SeekBar */
+        var radius = radiusInput.progress
+        /* Type of place from dropdown */
+        var placeType = placeTypeInput.selectedItem.toString()
+        /* If to use surf as search keyword */
+        var useSurfKeyword = surfKeywordInput.isChecked
+
         /* Create map of query parameter key-values */
-        val queryParams: Map<String, String> = mapOf(
-                "radius" to 1000.toString() ,
-                "type" to "lodging", //REPLACE WIRH 'lodging'
-//                "keyword" to "surf",
-                "key" to this.apiKey)
+        var queryParams: Map<String, String>
+        if(useSurfKeyword) {
+            queryParams = mapOf(
+                    "radius" to radius.toString(),
+                    "type" to placeType,
+                    "keyword" to "surf",
+                    "key" to this.currentApiKey)
+        }
+        else{
+            queryParams = mapOf(
+                    "radius" to radius.toString(),
+                    "type" to placeType,
+                    "key" to this.currentApiKey)
+        }
 
         /*  Get a logger */
         val logging = HttpLoggingInterceptor()
@@ -351,9 +402,6 @@ class MainActivity : AppCompatActivity() {
             var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
                     getString(R.string.zero_results_text), Snackbar.LENGTH_INDEFINITE)
             sb.show()
-
-//            /* Empty previous list of places */
-//            this.placesRecyclerAdapter.clearDataSet()
         }
 
         /* If other issue {ZERO_RESULTS,OVER_QUERY_LIMIT,REQUEST_DENIED..etc.}  */
@@ -366,15 +414,12 @@ class MainActivity : AppCompatActivity() {
             //sb.view.setBackgroundColor(0x9E1A1A)
             sb.show()
 
-//            /* Empty previous list of places */
-//            this.placesRecyclerAdapter.clearDataSet()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-//        outState.putParcelableArrayList("CURRENT_PLACES",
-//                placesRecyclerAdapter.placesArrayList)
+        //todo
     }
 
 }

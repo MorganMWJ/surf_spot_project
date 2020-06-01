@@ -10,6 +10,13 @@
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Dropdown options for Place Type spinner   -->
+    <string name="place_type_prompt">Choose a type</string>
+    <string-array name="place_type_array">
+        <item>Lodging</item>
+        <item>Cafe</item>
+    </string-array>
+
     <!-- Toast/Snackbar Strings -->
     <string name="parse_double_exception">Input Values must be doubles</string>
     <string name="empty_field_exception">Please enter location (latitude/longitude)</string>
