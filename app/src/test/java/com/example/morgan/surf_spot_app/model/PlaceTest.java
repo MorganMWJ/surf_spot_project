@@ -18,9 +18,9 @@ public class PlaceTest {
     @Test
     public void testCorrectSorting(){
 
-        Place goodPlace = new Place("Good", 3.2, null);
-        Place betterPlace = new Place("Better", 4.3, null);
-        Place bestPlace = new Place("Best", 4.9, null);
+        Place goodPlace = new Place("Good", 3.2, null, null);
+        Place betterPlace = new Place("Better", 4.3, null, null);
+        Place bestPlace = new Place("Best", 4.9, null, null);
 
         /* Create unsorted list of places */
         List<Place> places = new ArrayList<>();
@@ -48,11 +48,11 @@ public class PlaceTest {
      */
     @Test
     public void testCorrectSortingWhenRatingNull(){
-        Place nullPlace1 = new Place("Null", null, null);
-        Place nullPlace2 = new Place("Null", null, null);
-        Place goodPlace = new Place("Good", 3.2, null);
-        Place betterPlace = new Place("Better", 4.3, null);
-        Place bestPlace = new Place("Best", 4.9, null);
+        Place nullPlace1 = new Place("Null", null, null, null);
+        Place nullPlace2 = new Place("Null", null, null, null);
+        Place goodPlace = new Place("Good", 3.2, null, null);
+        Place betterPlace = new Place("Better", 4.3, null, null);
+        Place bestPlace = new Place("Best", 4.9, null, null);
 
         /* Create unsorted list of places */
         List<Place> places = new ArrayList<>();

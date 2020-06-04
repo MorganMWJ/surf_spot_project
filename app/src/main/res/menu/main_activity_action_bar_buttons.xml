@@ -2,20 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Search Input Button -->
+    <!-- Search Settings - Input Toggle Button -->
     <item android:id="@+id/settings_icon"
         android:icon="@drawable/ic_settings_white_48dp"
         android:title="Change Search Settings"
         app:showAsAction="ifRoom"/>
 
-    <!-- Map Launch Button -->
-    <item
-        android:id="@+id/map_icon"
-        android:icon="@drawable/ic_map_white_48dp"
-        android:title="@string/map_button_title"
-        app:showAsAction="ifRoom"/>
-
-    <!-- Key Change -->
+    <!-- API Key Change - Input Toggle Button -->
     <item
         android:id="@+id/key_change_icon"
         android:icon="@drawable/ic_api_key_white_48dp"

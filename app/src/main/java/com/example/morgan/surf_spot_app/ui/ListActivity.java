@@ -1,6 +1,9 @@
 package com.example.morgan.surf_spot_app.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.morgan.surf_spot_app.R;
 import com.example.morgan.surf_spot_app.model.Place;
@@ -14,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ListActivity extends AppCompatActivity {
 
-    /* Recycler View */
+    /* Recycler View instance variables */
     private RecyclerView recyclerView;
     private PlacesRecyclerWithListAdapter placesRecyclerAdapter;
     private RecyclerView.LayoutManager viewManager;
@@ -41,6 +44,7 @@ public class ListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(viewManager);
         recyclerView.setAdapter(placesRecyclerAdapter);
 
+        /* Extract Places array from Intent and use to initialise Recycler Adapter */
         ArrayList<Place> surfPlaces = getIntent().getParcelableArrayListExtra("com.example.surfspotapp.LIST");
         if (surfPlaces != null) {
 
@@ -53,6 +57,41 @@ public class ListActivity extends AppCompatActivity {
             this.placesRecyclerAdapter.changeDataSet(surfPlaces);
         }
 
+    }
+
+    /**
+     * Create an action bar.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.list_activity_action_bar_buttons, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Handle action bar button clicks.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if(item != null) {
+            if (item.getItemId() == R.id.map_icon) {
+
+                /* Launch intent for MapActivity passing List of Places */
+                Intent listResultsIntent = new Intent(this, MapActivity.class);
+
+                /* Add parcelable array list as intent extra to send to list activity  */
+                listResultsIntent.putParcelableArrayListExtra("com.example.surfspotapp.MAP",
+                        placesRecyclerAdapter.getPlacesArrayList());
+
+                /* Start MapActivity using Intent */
+                startActivity(listResultsIntent);
+            }
+            if(item.getItemId() == R.id.search_icon){
+                //todo - launch main/search activity
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

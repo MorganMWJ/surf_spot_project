@@ -17,10 +17,13 @@ public class Place implements Comparable<Place>, Parcelable{
     @SerializedName("opening_hours")
     private OpeningHours openingHours;
 
-    public Place(String name, Double rating, OpeningHours openingHours) {
+    private Geometry geometry;
+
+    public Place(String name, Double rating, OpeningHours openingHours, Geometry geometry) {
         this.name = name;
         this.rating = rating;
         this.openingHours = openingHours;
+        this.geometry = geometry;
     }
 
     public String getName() {
@@ -45,6 +48,14 @@ public class Place implements Comparable<Place>, Parcelable{
 
     public void setOpeningHours(OpeningHours openingHours) {
         this.openingHours = openingHours;
+    }
+
+    public Geometry getGeometry() {
+        return geometry;
+    }
+
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
     }
 
     /**
@@ -85,6 +96,7 @@ public class Place implements Comparable<Place>, Parcelable{
             dest.writeDouble(this.rating);
         }
         dest.writeParcelable(this.openingHours,0);
+        dest.writeParcelable(this.geometry, 0);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -92,7 +104,8 @@ public class Place implements Comparable<Place>, Parcelable{
             String nm = in.readString();
             Double rting = in.readDouble();
             OpeningHours oh = in.readParcelable(OpeningHours.class.getClassLoader());
-            return new Place(nm, rting, oh);
+            Geometry geo = in.readParcelable(Geometry.class.getClassLoader());
+            return new Place(nm, rting, oh, geo);
         }
 
         public Place[] newArray(int size) {

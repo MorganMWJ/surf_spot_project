@@ -13,7 +13,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -177,6 +176,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10f, locationListener)
         }
+
+        /* Get instance of Room Database */
+//        val db = Room.databaseBuilder(
+//                applicationContext,
+//                AppDatabase::class.java, "database-name"
+//        ).build()
+
     }
 
     /**
@@ -197,7 +203,7 @@ class MainActivity : AppCompatActivity() {
      * Create an action bar.
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.action_bar_buttons, menu);
+        menuInflater.inflate(R.menu.main_activity_action_bar_buttons, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -419,7 +425,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        //todo
+        //todo - save state of all input fields!
     }
 
 }
