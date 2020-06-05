@@ -7,6 +7,7 @@ import android.view.MenuItem;
 
 import com.example.morgan.surf_spot_app.R;
 import com.example.morgan.surf_spot_app.model.Place;
+import com.example.morgan.surf_spot_app.model.db.Search;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ public class ListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private PlacesRecyclerWithListAdapter placesRecyclerAdapter;
     private RecyclerView.LayoutManager viewManager;
+
+    /* Search object that this activity is displaying results for */
+    private Search currentSearch;
 
 
     @Override
@@ -57,6 +61,9 @@ public class ListActivity extends AppCompatActivity {
             this.placesRecyclerAdapter.changeDataSet(surfPlaces);
         }
 
+        /* Extract Search object from intent */
+        this.currentSearch = getIntent().getParcelableExtra("com.example.surfspotapp.SEARCH_OBJECT");
+
     }
 
     /**
@@ -83,11 +90,16 @@ public class ListActivity extends AppCompatActivity {
                 listResultsIntent.putParcelableArrayListExtra("com.example.surfspotapp.MAP",
                         placesRecyclerAdapter.getPlacesArrayList());
 
+                /* Add parcelable Search object as intent extra to map activity */
+                listResultsIntent.putExtra("com.example.surfspotapp.SEARCH_OBJECT", this.currentSearch);
+
                 /* Start MapActivity using Intent */
                 startActivity(listResultsIntent);
             }
             if(item.getItemId() == R.id.search_icon){
-                //todo - launch main/search activity
+                /* Launch main/search activity */
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
             }
         }
 

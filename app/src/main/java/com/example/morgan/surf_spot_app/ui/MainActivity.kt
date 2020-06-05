@@ -16,10 +16,14 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.room.Room
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.PlacesAPI
 import com.example.morgan.surf_spot_app.model.ResultWrapper
+import com.example.morgan.surf_spot_app.model.db.AppDatabase
+import com.example.morgan.surf_spot_app.model.db.Search
+import com.example.morgan.surf_spot_app.model.db.SearchDao
 import com.google.android.material.snackbar.Snackbar
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -28,9 +32,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
-/* Key for list intent content */
-const val LIST_INTENT_KEY = "com.example.surfspotapp.LIST"
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,6 +65,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var surfKeywordInput: CheckBox
     private lateinit var placeTypeInput: Spinner
 
+    /* Access to DB */
+    private lateinit var searchDao: SearchDao
+
 
 
 
@@ -86,10 +90,25 @@ class MainActivity : AppCompatActivity() {
         this.keyInput = findViewById(R.id.edit_key)
         this.surfKeywordInput = findViewById(R.id.keyword_checkbox)
         this.placeTypeInput = findViewById(R.id.type_dropdown)
+        this.radiusInput = findViewById(R.id.radius_bar)
+
+        /* By default 'surf' keyword is used */
+        this.surfKeywordInput.isChecked = true
+
+        /* Default search radius is 10000m / 10km */
+        this.radiusInput.progress = 10
+
+        /* Reload instance state upon screen re-orientation */
+        if(savedInstanceState != null) {
+            this.latInput.setText(savedInstanceState.getString("lat_input"))
+            this.longInput.setText(savedInstanceState.getString("long_input"))
+            this.radiusInput.progress = savedInstanceState.getInt("radius_input")
+            this.placeTypeInput.setSelection(savedInstanceState.getInt("type_input_spinner_position"))
+            this.surfKeywordInput.isChecked = savedInstanceState.getBoolean("use_surf_input")
+            this.keyInput.setText(savedInstanceState.getString("key_input"))
+        }
 
         /* Functionality of radius SeekBar */
-        this.radiusInput = findViewById(R.id.radius_bar)
-        this.radiusInput.progress = 10 // (Default 10000m / 10km)
         this.radiusInput.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {
                 /* Do Nothing */
@@ -133,6 +152,7 @@ class MainActivity : AppCompatActivity() {
             currentApiKey = apiKey
             var currentKeyTextView: TextView = findViewById(R.id.current_key)
             currentKeyTextView.text = currentApiKey
+            keyInput.text.clear()
         }
 
         /* Set functionality of set API key button */
@@ -142,6 +162,7 @@ class MainActivity : AppCompatActivity() {
             currentApiKey = keyInput.text.toString()
             var currentKeyTextView: TextView = findViewById(R.id.current_key)
             currentKeyTextView.text = currentApiKey
+            keyInput.text.clear()
         }
 
         /* Set up location manager & listener */
@@ -157,15 +178,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
-
+                /* Do Nothing */
             }
 
             override fun onProviderEnabled(provider: String) {
-
+                /* Do Nothing */
             }
 
             override fun onProviderDisabled(provider: String) {
-
+                /* Do Nothing */
             }
 
         }
@@ -177,12 +198,8 @@ class MainActivity : AppCompatActivity() {
             locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10f, locationListener)
         }
 
-        /* Get instance of Room Database */
-//        val db = Room.databaseBuilder(
-//                applicationContext,
-//                AppDatabase::class.java, "database-name"
-//        ).build()
-
+        /* Use DB instance to get a handle on SearchDao */
+        this.searchDao = AppDatabase.getDatabase(this).searchDao()
     }
 
     /**
@@ -238,48 +255,6 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-//    /**
-//     * Build and display input dialog for user to change api key.
-//     */
-//    private fun buildChangeApiKeyDialog(){
-//
-//        /* Build alert dialog with title and layout */
-//        var builder: AlertDialog.Builder = AlertDialog.Builder(this)
-//        builder.setTitle(R.string.change_key_dialog_title)
-//        builder.setView(R.layout.change_api_key_dialog_view)
-//
-//        /* Display current api key */
-//        val view = layoutInflater.inflate(R.layout.change_api_key_dialog_view, null)
-//        val keyTextView= view.findViewById<TextView>(R.id.api_key_text_view)
-//        if (keyTextView != null) {
-//            keyTextView.text = this.apiKey
-//        }
-//        builder.setView(view)
-//
-//        /* Positive button changes api key to user input */
-//        builder.setPositiveButton(R.string.ok){ dialog, _ ->
-//            val inputField = (dialog as AlertDialog).findViewById<EditText>(R.id.api_key_input)
-//            val input = inputField!!.text.toString()
-//
-//            /* Set new api key */
-//            if(input.isNotEmpty()) {
-//                this.apiKey = input
-//            }
-//
-//            /* Alert user to key change */
-//            Snackbar.make(findViewById(R.id.root_layout),
-//                    getString(R.string.key_change_text) + this.apiKey,
-//                    Snackbar.LENGTH_INDEFINITE).show()
-//        }
-//
-//        /* Negative button closes dialog */
-//        builder.setNegativeButton("Cancel") {dialog, _ ->
-//            dialog.cancel()
-//        }
-//
-//        builder.show()
-//    }
-
     /**
      * Update the text fields to display device latitude and
      * longitude taken from the GPS/location service.
@@ -294,13 +269,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Builds the set of query parameters and calls the Places API
+     * Builds the a search object and calls the Places API
      */
     private fun runSearch() {
 
-        /* Lat/Long as location string */
-        val location: String = latInput.text.toString() + "," + longInput.text.toString()
-
+        /* Latitude from input */
+        val lat: Double = latInput.text.toString().toDouble()
+        /* Longitude from input */
+        val lng: Double = longInput.text.toString().toDouble()
         /* Search Radius for SeekBar */
         var radius = radiusInput.progress
         /* Type of place from dropdown */
@@ -308,21 +284,12 @@ class MainActivity : AppCompatActivity() {
         /* If to use surf as search keyword */
         var useSurfKeyword = surfKeywordInput.isChecked
 
-        /* Create map of query parameter key-values */
-        var queryParams: Map<String, String>
-        if(useSurfKeyword) {
-            queryParams = mapOf(
-                    "radius" to radius.toString(),
-                    "type" to placeType,
-                    "keyword" to "surf",
-                    "key" to this.currentApiKey)
-        }
-        else{
-            queryParams = mapOf(
-                    "radius" to radius.toString(),
-                    "type" to placeType,
-                    "key" to this.currentApiKey)
-        }
+        /* Create Search object from inputs */
+        val newSearch = Search(lat, lng, radius, placeType, useSurfKeyword)
+        newSearch.apiKey = this.currentApiKey
+
+        /* Save search in the database */
+        searchDao.insertSearch(newSearch)
 
         /*  Get a logger */
         val logging = HttpLoggingInterceptor()
@@ -343,7 +310,7 @@ class MainActivity : AppCompatActivity() {
 
         /* Get retrofit client interface class and call object to getPlaces GET query */
         val jsonPlaceHolderApi = retrofit.create<PlacesAPI>(PlacesAPI::class.java)
-        val call = jsonPlaceHolderApi.getPlaces(location, queryParams)
+        val call = jsonPlaceHolderApi.getPlaces(newSearch.locationString, newSearch.queryParameters)
 
 
 
@@ -363,7 +330,7 @@ class MainActivity : AppCompatActivity() {
 
                 /* Handle result */
                 if(result != null) {
-                    handleResult(result)
+                    handleResult(result, newSearch)
                 }
             }
 
@@ -383,7 +350,7 @@ class MainActivity : AppCompatActivity() {
      * Handles result returned by places API call.
      * Either by displaying results or alerting user to status.
      */
-    fun handleResult(result: ResultWrapper){
+    fun handleResult(result: ResultWrapper, search: Search){
 
         /* If we have places in our results */
         if (result.results != null && result.results.isNotEmpty()) {
@@ -395,6 +362,8 @@ class MainActivity : AppCompatActivity() {
             val listResultsIntent = Intent(this, ListActivity::class.java).apply {
                 /* Add parcelable array list as intent extra to send to list activity  */
                 putParcelableArrayListExtra("com.example.surfspotapp.LIST", placesResult)
+                /* Add parcelable Search object as intent extra to send to list activity */
+                putExtra("com.example.surfspotapp.SEARCH_OBJECT", search);
             }
 
             /* Start ListActivity using Intent */
@@ -425,7 +394,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        //todo - save state of all input fields!
+        outState.putString("lat_input", this.latInput.text.toString())
+        outState.putString("long_input", this.longInput.text.toString())
+        outState.putInt("radius_input", this.radiusInput.progress)
+        outState.putInt("type_input_spinner_position", this.placeTypeInput.selectedItemPosition)
+        outState.putBoolean("use_surf_input", this.surfKeywordInput.isChecked)
+        outState.putString("key_input", this.keyInput.text.toString())
     }
 
 }

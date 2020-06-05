@@ -5,8 +5,10 @@ import java.util.List;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.TypeConverters;
 
 @Dao
+@TypeConverters({DateTimeConverter.class})
 public interface SearchDao {
 
     @Query("SELECT * FROM search")

@@ -2,10 +2,10 @@ package com.example.morgan.surf_spot_app.ui
 
 import android.app.Activity
 import android.app.Instrumentation
+import android.content.pm.ActivityInfo
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
@@ -124,6 +124,37 @@ class MainActivityTest {
         /* Check Snackbar alert is displayed */
         onView(withId(com.google.android.material.R.id.snackbar_text))
                 .check(matches(withText(R.string.empty_field_exception)))
+    }
+
+    @Test
+    fun checkSavedInstanceStateMaintainsInputsOnScreenReorientation(){
+        /* Launch MainActivity */
+        ActivityScenario.launch(MainActivity::class.java)
+
+        /* Set values for inputs */
+        onView(withId(R.id.edit_lat))
+                .perform(typeText("1234.5"))
+        onView(withId(R.id.edit_long ))
+                .perform(typeText("2345.6"))
+        onView(withId(R.id.keyword_checkbox))
+                .perform(scrollTo(), click())
+        onView(withId(R.id.edit_key))
+                .perform(scrollTo(), typeText("XXXX"))
+
+        /* Re-orientate the screen */
+        mainActivityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        /* Check inputs are still as previously set */
+        onView(withId(R.id.edit_lat))
+                .check(matches(withText("1234.5")))
+        onView(withId(R.id.edit_long))
+                .check(matches(withText("2345.6")))
+        onView(withId(R.id.keyword_checkbox))
+                .check(matches(isNotChecked()))
+        onView(withId(R.id.edit_key))
+                .check(matches(withText("XXXX")))
+
+
     }
 
 //    @Test

@@ -7,6 +7,7 @@ import android.view.MenuItem;
 
 import com.example.morgan.surf_spot_app.R;
 import com.example.morgan.surf_spot_app.model.Place;
+import com.example.morgan.surf_spot_app.model.db.Search;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -22,6 +23,7 @@ public class MapActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private ArrayList<Place> surfPlaces;
+    private Search currentSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,9 @@ public class MapActivity extends AppCompatActivity
 
         /* Extract Places array from Intent */
         this.surfPlaces = getIntent().getParcelableArrayListExtra("com.example.surfspotapp.MAP");
+
+        /* Extract Search object from intent */
+        this.currentSearch = getIntent().getParcelableExtra("com.example.surfspotapp.SEARCH_OBJECT");
 
     }
 
@@ -55,8 +60,14 @@ public class MapActivity extends AppCompatActivity
                     .title(place.getName()));
         }
 
+        /* Set appropriate zoom level */
+        googleMap.setMinZoomPreference(15);
+        googleMap.setMaxZoomPreference(20);
+
         /* Move the map's camera to the same location */
-        LatLng center = new LatLng(50.4165, 5.1002); //todo - temp, change to search lat/long
+        Double searchLat = this.currentSearch.getLatitude();
+        Double searchLng = this.currentSearch.getLongitude();
+        LatLng center = new LatLng(searchLat, searchLng);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(center));
     }
 
@@ -84,11 +95,17 @@ public class MapActivity extends AppCompatActivity
                 listResultsIntent.putParcelableArrayListExtra("com.example.surfspotapp.LIST",
                         surfPlaces);
 
+                /* Add parcelable Search object as intent extra to list activity */
+                listResultsIntent.putExtra("com.example.surfspotapp.SEARCH_OBJECT", this.currentSearch);
+
                 /* Start ListActivity using Intent */
                 startActivity(listResultsIntent);
             }
             if(item.getItemId() == R.id.search_icon){
-                //todo - launch main/search activity
+                /* Launch main/search activity */
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+
             }
         }
 

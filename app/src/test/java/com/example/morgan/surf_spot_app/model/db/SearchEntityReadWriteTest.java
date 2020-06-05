@@ -34,7 +34,7 @@ public class SearchEntityReadWriteTest {
 
     @Test
     public void writeUserAndReadInList() throws Exception {
-        Search newSearch = new Search();
+        Search newSearch = new Search(3.6,5.001, 2000, "lodging", true);
         searchDao.insertSearch(newSearch);
         List<Search> allSearches = searchDao.getAll();
         //assertThat(allSearches.get(0), equalTo(newSearch));
