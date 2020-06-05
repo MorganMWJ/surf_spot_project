@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ListActivity extends AppCompatActivity {
+public class ListActivity extends AppCompatActivity implements RecyclerViewClickListener{
 
     /* Recycler View instance variables */
     private RecyclerView recyclerView;
@@ -36,10 +36,10 @@ public class ListActivity extends AppCompatActivity {
         /* Reload instance state upon screen re-orientation */
         if(savedInstanceState != null){
             ArrayList<Place> savedPlaces = savedInstanceState.getParcelableArrayList("CURRENT_PLACES");
-            placesRecyclerAdapter = new PlacesRecyclerWithListAdapter(this, savedPlaces);
+            placesRecyclerAdapter = new PlacesRecyclerWithListAdapter(this, savedPlaces, this);
         }
         else{
-            placesRecyclerAdapter = new PlacesRecyclerWithListAdapter(this);
+            placesRecyclerAdapter = new PlacesRecyclerWithListAdapter(this, this);
         }
 
         /* Initialise recycler view & adapter */
@@ -64,6 +64,23 @@ public class ListActivity extends AppCompatActivity {
         /* Extract Search object from intent */
         this.currentSearch = getIntent().getParcelableExtra("com.example.surfspotapp.SEARCH_OBJECT");
 
+    }
+
+    /**
+     * Functionality when an item of the RecyclerView is clicked.
+     * Send Place object to be displayed in ViewActivity.
+     * @param p place clicked on.
+     */
+    @Override
+    public void recyclerViewListClicked(Place place){
+        /* Launch intent for ViewActivity passing Place to view */
+        Intent placeViewIntent = new Intent(this, ViewActivity.class);
+
+        /* Add parcelable Place object as intent extra to view activity */
+        placeViewIntent.putExtra("com.example.surfspotapp.PLACE_TO_VIEW", place);
+
+        /* Start ViewActivity using Intent */
+        startActivity(placeViewIntent);
     }
 
     /**

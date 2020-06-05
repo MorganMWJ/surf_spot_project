@@ -1,6 +1,7 @@
 package com.example.morgan.surf_spot_app.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,17 +24,20 @@ public class PlacesRecyclerWithListAdapter extends
 
     private final Context context;
     private List<Place> places;
+    private static RecyclerViewClickListener itemListener;
 
-    PlacesRecyclerWithListAdapter(Context context, List<Place> places){
+    PlacesRecyclerWithListAdapter(Context context, List<Place> places, RecyclerViewClickListener itemListener){
         this.context = context;
         this.places = places;
+        this.itemListener = itemListener;
 
         /* Sort places by rating */
         Collections.sort(this.places);
     }
 
-    PlacesRecyclerWithListAdapter(Context context){
+    PlacesRecyclerWithListAdapter(Context context, RecyclerViewClickListener itemListener){
         this.context = context;
+        this.itemListener = itemListener;
         String[] hrs = {"8am - 5pm, Monday - Friday", "12am - 4.30pm, Saturday"};
         OpeningHours oh = new OpeningHours(true, hrs);
         ArrayList<Place> tp = new ArrayList<>();
@@ -59,7 +63,7 @@ public class PlacesRecyclerWithListAdapter extends
         Collections.sort(this.places);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder{ //implements View.OnClickListener {
 
         TextView nameView;
         TextView ratingView;
@@ -71,6 +75,25 @@ public class PlacesRecyclerWithListAdapter extends
             nameView = itemView.findViewById(R.id.place_name_text_view);
             ratingView = itemView.findViewById(R.id.place_rating_text_view);
             hoursView = itemView.findViewById(R.id.place_open_hours_text_view);
+
+            /* Alert activity when user clicks on this ViewHolder */
+            //itemView.setOnClickListener(this);
+
+            nameView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    itemListener.recyclerViewListClicked(place);
+                }
+            });
+        }
+
+//        @Override
+//        public void onClick(View v) {
+//            itemListener.recyclerViewListClicked(v.getPlace());
+//        }
+
+        public Place getPlace(){
+            return place;
         }
 
         void bindDataSet(Place p){
