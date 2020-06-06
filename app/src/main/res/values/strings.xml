@@ -35,6 +35,7 @@
     <string name="map_button_title">Launch Map View</string>
     <string name="search_button_title">Launch Search View</string>
     <string name="list_button_title">Launch List View</string>
+    <string name="my_image_description">Place Image</string>
 
 
 </resources>

@@ -61,6 +61,10 @@ public class Search implements Parcelable {
         this.apiKey = apiKey;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
     /**
      * Get a location string containing Lat/lng to be used in API call.
      */
@@ -109,6 +113,7 @@ public class Search implements Parcelable {
         dest.writeInt(this.radius);
         dest.writeString(this.type);
         dest.writeByte((byte) (this.useSurfKeyword ? 1 : 0));
+        dest.writeString(this.apiKey);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -118,7 +123,10 @@ public class Search implements Parcelable {
             Integer radius = in.readInt();
             String type = in.readString();
             Boolean useSurf = in.readByte() != 0;
-            return new Search(lat, lng, radius, type, useSurf);
+            String key = in.readString();
+            Search search = new Search(lat, lng, radius, type, useSurf);
+            search.setApiKey(key);
+            return search;
         }
 
         public Search[] newArray(int size) {

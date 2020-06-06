@@ -38,32 +38,10 @@ public class PlacesRecyclerWithListAdapter extends
     PlacesRecyclerWithListAdapter(Context context, RecyclerViewClickListener itemListener){
         this.context = context;
         this.itemListener = itemListener;
-        String[] hrs = {"8am - 5pm, Monday - Friday", "12am - 4.30pm, Saturday"};
-        OpeningHours oh = new OpeningHours(true, hrs);
-        ArrayList<Place> tp = new ArrayList<>();
-        tp.add(new Place("Morgans PLAce", 6.5, oh, null));
-        tp.add(new Place("Joshs PLAce", 2.4, null, null));
-        tp.add(new Place("Morgans PLAce", 6.4, null, null));
-        tp.add(new Place("Joshs PLAce", 2.4, null, null));
-        tp.add(new Place("Morgans PLAce", 6.4, null, null));
-        tp.add(new Place("Joshs PLAce", 2.4, null, null));
-        tp.add(new Place("Morgans PLAce", 6.4, null, null));
-        tp.add(new Place("Joshs PLAce", 2.4, null, null));
-        tp.add(new Place("Morgans PLAce", 6.4, null, null));
-        tp.add(new Place("Joshs PLAce", 2.4, null, null));
-        tp.add(new Place("Morgans PLAce", 6.4, null, null));
-        tp.add(new Place("Joshs PLAce", 2.4, null, null));
-        tp.add(new Place("Morgans PLAce", 6.4, null, null));
-        tp.add(new Place("Joshs PLAce", 2.4, null, null));
-        tp.add(new Place("Morgans PLAce", 1.4, null, null));
-        tp.add(new Place("Joshs PLAce", 5.4, null, null));
-        this.places = tp;
-        //this.places = new ArrayList<>();
-        /* Sort places by rating */
-        Collections.sort(this.places);
+        this.places = new ArrayList<>();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{ //implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView nameView;
         TextView ratingView;
@@ -77,20 +55,13 @@ public class PlacesRecyclerWithListAdapter extends
             hoursView = itemView.findViewById(R.id.place_open_hours_text_view);
 
             /* Alert activity when user clicks on this ViewHolder */
-            //itemView.setOnClickListener(this);
-
-            nameView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    itemListener.recyclerViewListClicked(place);
-                }
-            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                itemListener.recyclerViewListClicked(place);
+                            }
+                        });
         }
-
-//        @Override
-//        public void onClick(View v) {
-//            itemListener.recyclerViewListClicked(v.getPlace());
-//        }
 
         public Place getPlace(){
             return place;

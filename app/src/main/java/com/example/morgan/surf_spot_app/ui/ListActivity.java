@@ -79,6 +79,9 @@ public class ListActivity extends AppCompatActivity implements RecyclerViewClick
         /* Add parcelable Place object as intent extra to view activity */
         placeViewIntent.putExtra("com.example.surfspotapp.PLACE_TO_VIEW", place);
 
+        /* Add parcelable Search object as intent extra to view activity */
+        placeViewIntent.putExtra("com.example.surfspotapp.SEARCH", this.currentSearch);
+
         /* Start ViewActivity using Intent */
         startActivity(placeViewIntent);
     }

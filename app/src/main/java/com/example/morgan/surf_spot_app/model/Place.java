@@ -5,6 +5,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Arrays;
+
 import androidx.annotation.NonNull;
 
 public class Place implements Comparable<Place>, Parcelable{
@@ -13,17 +16,30 @@ public class Place implements Comparable<Place>, Parcelable{
 
     private String name;
     private Double rating;
-
     @SerializedName("opening_hours")
     private OpeningHours openingHours;
-
     private Geometry geometry;
+    @SerializedName("price_level")
+    private Integer priceLevel;
+    private String website;
+    @SerializedName("formatted_address")
+    private String address;
+    @SerializedName("formatted_phone_number")
+    private String phoneNumber;
+    private Photo[] photos;
 
-    public Place(String name, Double rating, OpeningHours openingHours, Geometry geometry) {
+    public Place(String name, Double rating, OpeningHours openingHours,
+                 Geometry geometry, Integer priceLevel, String website,
+                 String address, String phoneNumber, Photo[] photos) {
         this.name = name;
         this.rating = rating;
         this.openingHours = openingHours;
         this.geometry = geometry;
+        this.priceLevel = priceLevel;
+        this.website = website;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.photos = photos;
     }
 
     public String getName() {
@@ -38,24 +54,32 @@ public class Place implements Comparable<Place>, Parcelable{
         return rating;
     }
 
-    public void setRating(Double rating) {
-        this.rating = rating;
-    }
-
     public OpeningHours getOpeningHours() {
         return openingHours;
-    }
-
-    public void setOpeningHours(OpeningHours openingHours) {
-        this.openingHours = openingHours;
     }
 
     public Geometry getGeometry() {
         return geometry;
     }
 
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
+    public Integer getPriceLevel() {
+        return priceLevel;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public Photo[] getPhotos() {
+        return photos;
     }
 
     /**
@@ -97,6 +121,17 @@ public class Place implements Comparable<Place>, Parcelable{
         }
         dest.writeParcelable(this.openingHours,0);
         dest.writeParcelable(this.geometry, 0);
+        if(this.priceLevel==null){
+            /* Nulls can be written as String to Parcelable */
+            dest.writeString(null);
+        }
+        else {
+            dest.writeInt(this.priceLevel);
+        }
+        dest.writeString(this.website);
+        dest.writeString(this.address);
+        dest.writeString(this.phoneNumber);
+        dest.writeParcelableArray(this.photos,0);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -105,7 +140,22 @@ public class Place implements Comparable<Place>, Parcelable{
             Double rting = in.readDouble();
             OpeningHours oh = in.readParcelable(OpeningHours.class.getClassLoader());
             Geometry geo = in.readParcelable(Geometry.class.getClassLoader());
-            return new Place(nm, rting, oh, geo);
+            Integer pl = in.readInt();
+            if(pl == -1){
+                pl = null;
+            }
+            String web = in.readString();
+            String addr = in.readString();
+            String pn = in.readString();
+
+            /* Convert from Parcelable[] result to Photo[] */
+            Parcelable[] parcelArray = in.readParcelableArray(Photo.class.getClassLoader());
+            Photo[] photos = null;
+            if (parcelArray != null) {
+                photos = Arrays.copyOf(parcelArray, parcelArray.length, Photo[].class);
+            }
+
+            return new Place(nm, rting, oh, geo, pl, web, addr, pn, photos);
         }
 
         public Place[] newArray(int size) {

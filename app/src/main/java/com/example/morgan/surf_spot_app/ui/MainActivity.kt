@@ -309,7 +309,7 @@ class MainActivity : AppCompatActivity() {
                 .build()
 
         /* Get retrofit client interface class and call object to getPlaces GET query */
-        val jsonPlaceHolderApi = retrofit.create<PlacesAPI>(PlacesAPI::class.java)
+        val jsonPlaceHolderApi = retrofit.create(PlacesAPI::class.java)
         val call = jsonPlaceHolderApi.getPlaces(newSearch.locationString, newSearch.queryParameters)
 
 
