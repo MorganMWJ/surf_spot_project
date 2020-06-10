@@ -1,22 +1,14 @@
 package com.example.morgan.surf_spot_app.ui
 
-import android.app.Activity
-import android.app.Instrumentation
 import android.content.pm.ActivityInfo
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.Intents.intending
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import androidx.test.espresso.intent.matcher.IntentMatchers.isInternal
-import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.example.morgan.surf_spot_app.R
-import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -29,11 +21,11 @@ class MainActivityTest {
     @Rule @JvmField val mainActivityRule: ActivityTestRule<MainActivity> = ActivityTestRule(MainActivity::class.java)
     //@Rule @JvmField val listActivityRule: IntentsTestRule<ListActivity> = IntentsTestRule(ListActivity::class.java)
 
-    private var activity: MainActivity?  = null
+    private var fragment: MainActivity?  = null
 
     @Before
     fun setUp() {
-        this.activity = mainActivityRule.activity
+        this.fragment = mainActivityRule.activity
     }
 
 //    @Before
@@ -227,6 +219,6 @@ class MainActivityTest {
 
     @After
     fun tearDown() {
-        this.activity = null
+        this.fragment = null
     }
 }

@@ -16,7 +16,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.room.Room
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.PlacesAPI

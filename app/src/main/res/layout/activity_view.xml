@@ -1,22 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root_layout_view_activity"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/place_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/my_image_description"
-        />
+    <RelativeLayout
+        android:id="@+id/root_layout_view_activity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/place_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/place_image"/>
+        <ImageView
+            android:id="@+id/place_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/my_image_description"
+            />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/place_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@drawable/textlines"
+            tools:text="Morgan's Place"
+            android:layout_below="@id/place_image"/>
 
+        <TextView
+            android:id="@+id/place_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@drawable/textlines"
+            tools:text="4.5/5"
+            android:layout_below="@id/place_name"/>
+
+        <TextView
+            android:id="@+id/place_open_hours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@drawable/textlines"
+            tools:text="Open Now"
+            android:layout_below="@id/place_rating"/>
+
+        <TextView
+            android:id="@+id/place_price_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@drawable/textlines"
+            tools:text="Inexpensive"
+            android:layout_below="@id/place_open_hours"/>
+
+        <TextView
+            android:id="@+id/place_website"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@drawable/textlines"
+            tools:text="www.coolplace.co.uk"
+            android:layout_below="@id/place_price_level"/>
+
+        <TextView
+            android:id="@+id/place_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@drawable/textlines"
+            tools:text="34, Malibu Way, Syndey, OZ"
+            android:layout_below="@id/place_website"/>
+
+        <TextView
+            android:id="@+id/place_phone_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@drawable/textlines"
+            tools:text="01633 567865"
+            android:layout_below="@id/place_address"/>
+
+    </RelativeLayout>
+</ScrollView>
 

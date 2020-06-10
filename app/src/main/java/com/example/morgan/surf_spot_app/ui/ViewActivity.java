@@ -51,6 +51,36 @@ public class ViewActivity extends AppCompatActivity {
         /* Populate with Place object attributes */
         TextView name = findViewById(R.id.place_name);
         name.setText(this.place.getName());
+
+        if (this.place.getRating() != null) {
+            TextView rating = findViewById(R.id.place_rating);
+            rating.setText(this.place.getRating().toString());
+        }
+
+        if(this.place.getOpeningHours() != null) {
+            TextView openHours = findViewById(R.id.place_open_hours);
+            openHours.setText(this.place.getOpeningHours().toHtmlString());
+        }
+
+        if(this.place.getPriceLevel() != null) {
+            TextView priceLevel = findViewById(R.id.place_price_level);
+            priceLevel.setText(this.place.getPriceLevel().toString());
+        }
+
+        if(this.place.getWebsite() != null) {
+            TextView website = findViewById(R.id.place_website);
+            website.setText(this.place.getWebsite());
+        }
+
+        if(this.place.getAddress() != null) {
+            TextView address = findViewById(R.id.place_address);
+            address.setText(this.place.getAddress());
+        }
+
+        if(this.place.getPhoneNumber() != null) {
+            TextView phone = findViewById(R.id.place_phone_number);
+            phone.setText(this.place.getPhoneNumber());
+        }
         //todo
     }
 
