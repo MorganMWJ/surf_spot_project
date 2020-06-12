@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ListActivity extends AppCompatActivity implements RecyclerViewClickListener{
+public class ListActivity extends AppCompatActivity implements PlacesRecyclerViewClickListener {
 
     /* Recycler View instance variables */
     private RecyclerView recyclerView;
@@ -72,7 +72,7 @@ public class ListActivity extends AppCompatActivity implements RecyclerViewClick
      * @param p place clicked on.
      */
     @Override
-    public void recyclerViewListClicked(Place place){
+    public void placesRecyclerViewListClicked(Place place){
         /* Launch intent for ViewActivity passing Place to view */
         Intent placeViewIntent = new Intent(this, ViewActivity.class);
 

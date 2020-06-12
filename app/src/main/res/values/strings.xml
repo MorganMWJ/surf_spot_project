@@ -37,5 +37,10 @@
     <string name="list_button_title">Launch List View</string>
     <string name="my_image_description">Place Image</string>
 
+    <!--  Tab Headings  -->
+    <string name="recent_searches_tab">History</string>
+    <string name="search_tab">Search</string>
+    <string name="settings_tab">Settings</string>
+
 
 </resources>

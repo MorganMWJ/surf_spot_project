@@ -1,7 +1,6 @@
 package com.example.morgan.surf_spot_app.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.morgan.surf_spot_app.R;
-import com.example.morgan.surf_spot_app.model.OpeningHours;
 import com.example.morgan.surf_spot_app.model.Place;
 
 import java.util.ArrayList;
@@ -24,9 +22,9 @@ public class PlacesRecyclerWithListAdapter extends
 
     private final Context context;
     private List<Place> places;
-    private static RecyclerViewClickListener itemListener;
+    private static PlacesRecyclerViewClickListener itemListener;
 
-    PlacesRecyclerWithListAdapter(Context context, List<Place> places, RecyclerViewClickListener itemListener){
+    PlacesRecyclerWithListAdapter(Context context, List<Place> places, PlacesRecyclerViewClickListener itemListener){
         this.context = context;
         this.places = places;
         this.itemListener = itemListener;
@@ -35,7 +33,7 @@ public class PlacesRecyclerWithListAdapter extends
         Collections.sort(this.places);
     }
 
-    PlacesRecyclerWithListAdapter(Context context, RecyclerViewClickListener itemListener){
+    PlacesRecyclerWithListAdapter(Context context, PlacesRecyclerViewClickListener itemListener){
         this.context = context;
         this.itemListener = itemListener;
         this.places = new ArrayList<>();
@@ -58,7 +56,7 @@ public class PlacesRecyclerWithListAdapter extends
             itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                itemListener.recyclerViewListClicked(place);
+                                itemListener.placesRecyclerViewListClicked(place);
                             }
                         });
         }

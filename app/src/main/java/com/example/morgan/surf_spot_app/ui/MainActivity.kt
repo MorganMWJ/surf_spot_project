@@ -9,13 +9,16 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.*
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.morgan.surf_spot_app.R
 import com.example.morgan.surf_spot_app.model.Place
 import com.example.morgan.surf_spot_app.model.PlacesAPI
@@ -24,6 +27,7 @@ import com.example.morgan.surf_spot_app.model.db.AppDatabase
 import com.example.morgan.surf_spot_app.model.db.Search
 import com.example.morgan.surf_spot_app.model.db.SearchDao
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -35,39 +39,31 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity() {
 
     /* Latitude & longitude of device */
-    private var latitude: Double = 50.4164582
-    private var longitude: Double = -5.100202299999978
+    private var deviceLatitude: Double = 50.4164582
+    private var deviceLongitude: Double = -5.100202299999978
 
-    /* Input Fields */
-    private lateinit var latInput: EditText
-    private lateinit var longInput: EditText
-    private lateinit var keyInput: EditText
+    /* Search settings */
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
+    private var radius: Int = 1000
+    private var placeType: String = "Lodging"
+    private var useSurfKeyword: Boolean = true
 
-    /* If extra settings input fields are currently shown */
-    private var displayingSettingsSection: Boolean = true
+    /* Default Google Places API key */
+    private val apiKey = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
 
-    /* If displaying change API key section */
-    private var displayingChangeApiKeySection: Boolean = true
+    /* User set Google Places API key */
+    private var currentApiKey = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
 
     /* Location Manager & Listener */
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
 
-    /* Default Google Places API key */
-    private val apiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
-
-    /* User set Google Places API key */
-    private var currentApiKey: String = "AIzaSyCgG0fI-uAhdByF0L63kB-9hjuWTjMpqwM"
-
-    /* Inputs for extra options section */
-    private lateinit var radiusInput: SeekBar
-    private lateinit var surfKeywordInput: CheckBox
-    private lateinit var placeTypeInput: Spinner
-
     /* Access to DB */
     private lateinit var searchDao: SearchDao
 
-
+    private lateinit var pagerAdapter: SectionsPagerAdapter
+    private lateinit var pager: ViewPager
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -83,86 +79,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /* Handle on inputs */
-        this.latInput = findViewById(R.id.edit_lat)
-        this.longInput = findViewById(R.id.edit_long)
-        this.keyInput = findViewById(R.id.edit_key)
-        this.surfKeywordInput = findViewById(R.id.keyword_checkbox)
-        this.placeTypeInput = findViewById(R.id.type_dropdown)
-        this.radiusInput = findViewById(R.id.radius_bar)
-
-        /* By default 'surf' keyword is used */
-        this.surfKeywordInput.isChecked = true
-
-        /* Default search radius is 10000m / 10km */
-        this.radiusInput.progress = 10
-
-        /* Reload instance state upon screen re-orientation */
-        if(savedInstanceState != null) {
-            this.latInput.setText(savedInstanceState.getString("lat_input"))
-            this.longInput.setText(savedInstanceState.getString("long_input"))
-            this.radiusInput.progress = savedInstanceState.getInt("radius_input")
-            this.placeTypeInput.setSelection(savedInstanceState.getInt("type_input_spinner_position"))
-            this.surfKeywordInput.isChecked = savedInstanceState.getBoolean("use_surf_input")
-            this.keyInput.setText(savedInstanceState.getString("key_input"))
-        }
-
-        /* Functionality of radius SeekBar */
-        this.radiusInput.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {
-                /* Do Nothing */
-            }
-
-            override fun onStartTrackingTouch(seek: SeekBar) {
-                /* Do Nothing */
-            }
-
-            override fun onStopTrackingTouch(seek: SeekBar) {
-                /* Alert user to successful change of radius */
-                Toast.makeText(this@MainActivity,
-                        "Radius set: " + seek.progress + "km",
-                        Toast.LENGTH_SHORT).show()
-            }
-        })
-
-        /* Set functionality of load location button */
-        var loadLocationButton: Button = findViewById(R.id.load_location_button)
-        loadLocationButton.setOnClickListener {
-            loadLocationFromGPS()
-        }
-
-        /* Set functionality of search button */
-        var searchButton: Button = findViewById(R.id.run_search_button)
-        searchButton.setOnClickListener{
-            if(latInput.text.toString().isNotEmpty() && longInput.text.toString().isNotEmpty()) {
-                /* Run the search to get a list places */
-                runSearch()
-            }
-            else{
-                Snackbar.make(findViewById(R.id.root_layout),
-                        R.string.empty_field_exception,
-                        Snackbar.LENGTH_SHORT).show()
-            }
-        }
-
-        /* Set functionality of reset default API key button */
-        var resetKeyButton: Button = findViewById(R.id.reset_default_api_key_button)
-        resetKeyButton.setOnClickListener{
-            currentApiKey = apiKey
-            var currentKeyTextView: TextView = findViewById(R.id.current_key)
-            currentKeyTextView.text = currentApiKey
-            keyInput.text.clear()
-        }
-
-        /* Set functionality of set API key button */
-        var setKeyButton: Button = findViewById(R.id.set_api_key_button)
-        setKeyButton.setOnClickListener{
-            /* Get text from new key input */
-            currentApiKey = keyInput.text.toString()
-            var currentKeyTextView: TextView = findViewById(R.id.current_key)
-            currentKeyTextView.text = currentApiKey
-            keyInput.text.clear()
-        }
 
         /* Set up location manager & listener */
         locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -170,10 +86,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onLocationChanged(location: Location) {
                 Log.i("LOCATION", location.toString())
-                //Toast.makeText(getApplicationContext(),location.latitude.toString()+" , "+location.longitude.toString(),Toast.LENGTH_SHORT).show();
-                setLatitude(location.latitude)
-                setLongitude(location.longitude)
-
+                setDeviceLatitude(location.latitude)
+                setDeviceLongitude(location.longitude)
             }
 
             override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
@@ -199,6 +113,45 @@ class MainActivity : AppCompatActivity() {
 
         /* Use DB instance to get a handle on SearchDao */
         this.searchDao = AppDatabase.getDatabase(this).searchDao()
+
+
+        /* attach the adapter to the view pager - for swipe functionality */
+        this.pagerAdapter = SectionsPagerAdapter(supportFragmentManager)
+        this.pager = findViewById(R.id.pager)
+
+        this.pager.addOnPageChangeListener(object : OnPageChangeListener {
+            override fun onPageScrolled(i: Int, v: Float, i1: Int) {}
+            override fun onPageSelected(i: Int) {
+                when (i) {
+                    0, 1, 2 -> {
+                    }
+                    else -> {
+                    }
+                }
+            }
+
+            override fun onPageScrollStateChanged(i: Int) {}
+        })
+
+        this.pager.adapter = pagerAdapter
+
+        /* Associate the TabLayout it with the view pager */
+        val tabLayout: TabLayout = findViewById(R.id.tab_layout)
+        tabLayout.setupWithViewPager(pager)
+    }
+
+    /**
+     * Setter for deviceLatitude instance variable.
+     */
+    fun setDeviceLatitude(dl: Double){
+        this.deviceLatitude = dl
+    }
+
+    /**
+     * Setter for deviceLongitude instance variable.
+     */
+    fun setDeviceLongitude(dl: Double){
+        this.deviceLongitude = dl
     }
 
     /**
@@ -216,52 +169,99 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Create an action bar.
+     * Setter for radius instance variable.
      */
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_activity_action_bar_buttons, menu)
-        return super.onCreateOptionsMenu(menu)
+    fun setRadius(radius: Int){
+        this.radius = radius
     }
 
     /**
-     * Handle action bar button clicks.
+     * Setter for placeType instance variable.
      */
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-
-        if(item != null) {
-            if (item.itemId == R.id.key_change_icon) {
-                if(this.displayingChangeApiKeySection) {
-                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.GONE
-                    displayingChangeApiKeySection = false
-                }
-                else{
-                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.VISIBLE
-                    displayingChangeApiKeySection = true
-                }
-            }
-            if (item.itemId == R.id.settings_icon){
-                if(this.displayingSettingsSection) {
-                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.GONE
-                    displayingSettingsSection = false
-                }
-                else{
-                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.VISIBLE
-                    displayingSettingsSection = true
-                }
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
+    fun setPlaceType(placeType: String){
+        this.placeType = placeType
     }
 
     /**
-     * Update the text fields to display device latitude and
-     * longitude taken from the GPS/location service.
+     * Setter for surfKeyword instance variable.
      */
-    private fun loadLocationFromGPS(){
+    fun setSurfKeyword(surfKeyword: Boolean){
+        this.useSurfKeyword = surfKeyword
+    }
+
+    /**
+     * Set the currently used API key to the default.
+     */
+    fun resetApiKey(){
+        this.currentApiKey = this.apiKey
+    }
+
+    /**
+     * Setter for currentApiKey instance variable.
+     */
+    fun setCurrentApiKey(currentApiKey: String){
+        this.currentApiKey = currentApiKey
+    }
+
+    /**
+     * Getter for currentApiKey instance variable.
+     */
+    fun getCurrentApiKey(): String{
+        return this.currentApiKey
+    }
+
+//    /**
+//     * Create an action bar.
+//     */
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.main_activity_action_bar_buttons, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
+//
+//    /**
+//     * Handle action bar button clicks.
+//     */
+//    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+//
+//        if(item != null) {
+//            if (item.itemId == R.id.key_change_icon) {
+//                if(this.displayingChangeApiKeySection) {
+//                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.GONE
+//                    displayingChangeApiKeySection = false
+//                }
+//                else{
+//                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.VISIBLE
+//                    displayingChangeApiKeySection = true
+//                }
+//            }
+//            if (item.itemId == R.id.settings_icon){
+//                if(this.displayingSettingsSection) {
+//                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.GONE
+//                    displayingSettingsSection = false
+//                }
+//                else{
+//                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.VISIBLE
+//                    displayingSettingsSection = true
+//                }
+//            }
+//        }
+//
+//        return super.onOptionsItemSelected(item)
+//    }
+
+    /**
+     * Set search lat/long to device location.
+     * Update the text fields to display device latitude & longitude.
+     */
+    fun loadLocationFromGPS(latInput: EditText, longInput: EditText){
+
+        /* Set lat/long to device location */
+        setLongitude(this.deviceLongitude)
+        setLatitude(this.deviceLatitude)
+
         /* Display values in text fields */
-        this.latInput.setText(""+this.latitude)
-        this.longInput.setText(""+this.longitude)
+        latInput.setText(""+this.latitude)
+        longInput.setText(""+this.longitude)
 
         /* Notify user of success */
         Toast.makeText(this@MainActivity, "Loaded location from GPS.", Toast.LENGTH_SHORT).show()
@@ -270,21 +270,10 @@ class MainActivity : AppCompatActivity() {
     /**
      * Builds the a search object and calls the Places API
      */
-    private fun runSearch() {
-
-        /* Latitude from input */
-        val lat: Double = latInput.text.toString().toDouble()
-        /* Longitude from input */
-        val lng: Double = longInput.text.toString().toDouble()
-        /* Search Radius for SeekBar */
-        var radius = radiusInput.progress
-        /* Type of place from dropdown */
-        var placeType = placeTypeInput.selectedItem.toString()
-        /* If to use surf as search keyword */
-        var useSurfKeyword = surfKeywordInput.isChecked
+    fun runSearch() {
 
         /* Create Search object from inputs */
-        val newSearch = Search(lat, lng, radius, placeType, useSurfKeyword)
+        val newSearch = Search(latitude, longitude, radius, placeType, useSurfKeyword)
         newSearch.apiKey = this.currentApiKey
 
         /* Save search in the database */
@@ -318,7 +307,7 @@ class MainActivity : AppCompatActivity() {
 
                 /* If not successful print out status code and return */
                 if (!response.isSuccessful) {
-                    var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+                    var sb: Snackbar = Snackbar.make(findViewById(android.R.id.content),
                             "Code: " + response.code(), Snackbar.LENGTH_INDEFINITE)
                     sb.show()
                     return
@@ -335,7 +324,9 @@ class MainActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<ResultWrapper>, t: Throwable) {
                 /* On call failure show error message */
-                var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+                //var currentFragment: Fragment? = pagerAdapter.getItem(pager.currentItem)
+
+                var sb: Snackbar = Snackbar.make(findViewById(android.R.id.content),
                         t.message.toString(), Snackbar.LENGTH_INDEFINITE)
                 sb.show()
             }
@@ -373,16 +364,16 @@ class MainActivity : AppCompatActivity() {
         else if(result.status == "ZERO_RESULTS"){
 
             /* Tell user there were no results */
-            var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+            var sb: Snackbar = Snackbar.make(findViewById(android.R.id.content),
                     getString(R.string.zero_results_text), Snackbar.LENGTH_INDEFINITE)
             sb.show()
         }
 
         /* If other issue {ZERO_RESULTS,OVER_QUERY_LIMIT,REQUEST_DENIED..etc.}  */
         else{
-
+            pager.adapter
             /* Tell user there was a problem with the request */
-            var sb: Snackbar = Snackbar.make(findViewById(R.id.root_layout),
+            var sb: Snackbar = Snackbar.make(findViewById(android.R.id.content),
                     getString(R.string.request_issue_text) + result.status,
                     Snackbar.LENGTH_INDEFINITE)
             //sb.view.setBackgroundColor(0x9E1A1A)
@@ -393,12 +384,43 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("lat_input", this.latInput.text.toString())
-        outState.putString("long_input", this.longInput.text.toString())
-        outState.putInt("radius_input", this.radiusInput.progress)
-        outState.putInt("type_input_spinner_position", this.placeTypeInput.selectedItemPosition)
-        outState.putBoolean("use_surf_input", this.surfKeywordInput.isChecked)
-        outState.putString("key_input", this.keyInput.text.toString())
+//        outState.putString("lat_input", this.latInput.text.toString())
+//        outState.putString("long_input", this.longInput.text.toString())
+//        outState.putInt("radius_input", this.radiusInput.progress)
+//        outState.putInt("type_input_spinner_position", this.placeTypeInput.selectedItemPosition)
+//        outState.putBoolean("use_surf_input", this.surfKeywordInput.isChecked)
+//        outState.putString("key_input", this.keyInput.text.toString())
+    }
+
+    //a class that knows how to manage fragments
+    //adapter needed to associate fragments with the view pager
+    private class SectionsPagerAdapter  //NEED THIS CONSTRUCTOR WILL LEARN WHY LATER
+    (fm: FragmentManager?) : FragmentPagerAdapter(fm) {
+        //where we create and return fragment objects depending on which page is being displayed
+        override fun getItem(position: Int): Fragment? {
+            when (position) {
+                0 -> return RecentSearchesFragment()
+                1 -> return SearchFragment()
+                2 -> return SettingsFragment()
+            }
+            return null
+        }
+
+        //method adds labels to each of our tabs
+        //allows each swipe position to have a page title
+        override fun getPageTitle(pos: Int): CharSequence? {
+            when (pos) {
+                0 -> return "History"
+                1 -> return "Search"
+                2 -> return "Settings"
+            }
+            return null
+        }
+
+        //number of pages the view pager supports -  one for each tab
+        override fun getCount(): Int {
+            return 3
+        }
     }
 
 }

@@ -87,6 +87,34 @@ public class Search implements Parcelable {
     }
 
     /**
+     * Getter for radius.
+     */
+    public int getRadius(){
+        return radius;
+    }
+
+    /**
+     * Getter for type.
+     */
+    public String getType(){
+        return type;
+    }
+
+    /**
+     * Getter for useSurfKeyword.
+     */
+    public boolean getUseSurfKeyword(){
+        return useSurfKeyword;
+    }
+
+    /**
+     * Getter for searchTime.
+     */
+    public Date getSearchTime(){
+        return searchTime;
+    }
+
+    /**
         Create a Map of query parameter Key-Values to be used in API call.
      */
     public Map<String, String> getQueryParameters(){
