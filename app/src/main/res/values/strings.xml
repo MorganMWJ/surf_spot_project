@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Surf Places</string>
+    <string name="app_name">Surf Spots</string>
 
     <!-- Main Activity Strings -->
     <string name="hint_word">Enter a location (latitude/longitude)</string>

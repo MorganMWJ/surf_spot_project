@@ -138,6 +138,9 @@ class MainActivity : AppCompatActivity() {
         /* Associate the TabLayout it with the view pager */
         val tabLayout: TabLayout = findViewById(R.id.tab_layout)
         tabLayout.setupWithViewPager(pager)
+
+        /* Start app on Search Fragment */
+        this.pager.currentItem = 1
     }
 
     /**
@@ -209,45 +212,6 @@ class MainActivity : AppCompatActivity() {
     fun getCurrentApiKey(): String{
         return this.currentApiKey
     }
-
-//    /**
-//     * Create an action bar.
-//     */
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.main_activity_action_bar_buttons, menu)
-//        return super.onCreateOptionsMenu(menu)
-//    }
-//
-//    /**
-//     * Handle action bar button clicks.
-//     */
-//    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-//
-//        if(item != null) {
-//            if (item.itemId == R.id.key_change_icon) {
-//                if(this.displayingChangeApiKeySection) {
-//                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.GONE
-//                    displayingChangeApiKeySection = false
-//                }
-//                else{
-//                    findViewById<GridLayout>(R.id.api_key_section_layout).visibility = View.VISIBLE
-//                    displayingChangeApiKeySection = true
-//                }
-//            }
-//            if (item.itemId == R.id.settings_icon){
-//                if(this.displayingSettingsSection) {
-//                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.GONE
-//                    displayingSettingsSection = false
-//                }
-//                else{
-//                    findViewById<GridLayout>(R.id.settings_section_layout).visibility = View.VISIBLE
-//                    displayingSettingsSection = true
-//                }
-//            }
-//        }
-//
-//        return super.onOptionsItemSelected(item)
-//    }
 
     /**
      * Set search lat/long to device location.
@@ -382,21 +346,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-//        outState.putString("lat_input", this.latInput.text.toString())
-//        outState.putString("long_input", this.longInput.text.toString())
-//        outState.putInt("radius_input", this.radiusInput.progress)
-//        outState.putInt("type_input_spinner_position", this.placeTypeInput.selectedItemPosition)
-//        outState.putBoolean("use_surf_input", this.surfKeywordInput.isChecked)
-//        outState.putString("key_input", this.keyInput.text.toString())
-    }
-
-    //a class that knows how to manage fragments
-    //adapter needed to associate fragments with the view pager
-    private class SectionsPagerAdapter  //NEED THIS CONSTRUCTOR WILL LEARN WHY LATER
+    /**
+     * Class that knows how to manage fragments -
+       Adapter needed to associate fragments with the view pager
+     */
+    private class SectionsPagerAdapter
     (fm: FragmentManager?) : FragmentPagerAdapter(fm) {
-        //where we create and return fragment objects depending on which page is being displayed
+
+        /**
+         * Returns a different fragment object for each position
+         * on the view pager.
+         */
         override fun getItem(position: Int): Fragment? {
             when (position) {
                 0 -> return RecentSearchesFragment()
@@ -406,8 +366,10 @@ class MainActivity : AppCompatActivity() {
             return null
         }
 
-        //method adds labels to each of our tabs
-        //allows each swipe position to have a page title
+        /**
+         *  Method adds labels to each of our tabs
+           allows each swipe position to have a page title.
+         */
         override fun getPageTitle(pos: Int): CharSequence? {
             when (pos) {
                 0 -> return "History"
@@ -417,7 +379,9 @@ class MainActivity : AppCompatActivity() {
             return null
         }
 
-        //number of pages the view pager supports -  one for each tab
+        /**
+         *  Number of pages the view pager supports.
+         */
         override fun getCount(): Int {
             return 3
         }

@@ -1,5 +1,6 @@
 package com.example.morgan.surf_spot_app.ui;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -26,7 +27,9 @@ public class SearchesRecyclerWithListAdapter extends
     @NonNull
     @Override
     public SearchesRecyclerWithListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+        /* create a view holder with its view as the relative layout for a recycled item */
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_search_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -78,7 +81,7 @@ public class SearchesRecyclerWithListAdapter extends
 
         void bindDataSet(Search s){
             latLongView.setText(s.getLocationString());
-            radiusView.setText(s.getRadius());
+            radiusView.setText(s.getRadius()+"");
             typeView.setText(s.getType());
             surfKeywordView.setText(s.getUseSurfKeyword() ? "Yes" : "No");
             searchTimeView.setText(s.getSearchTime().toString());
